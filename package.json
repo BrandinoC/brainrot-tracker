@@ -1,0 +1,60 @@
+{
+  "name": "rotvault",
+  "productName": "RotVault",
+  "version": "1.0.0",
+  "description": "Track Brainrot stock, sales, and profit for Steal The Brainrots",
+  "main": "electron/main.js",
+  "author": "BrandinoC",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win",
+    "build:dir": "electron-builder --win --dir"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.rotvault.app",
+    "productName": "RotVault",
+    "icon": "electron/icon.png",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "app.js",
+      "styles.css",
+      "catalog-data.js",
+      "types-data.js",
+      "traits-data.js",
+      "version.json",
+      "electron/**/*"
+    ],
+    "electronLanguages": [
+      "en-US"
+    ],
+    "compression": "maximum",
+    "asar": true,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "RotVault"
+    }
+  }
+}

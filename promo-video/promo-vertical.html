@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RotVault TikTok</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="promo-shared.css">
+  <style>
+    body { width: 1080px; height: 1920px; }
+    .scene { padding: 80px 48px 200px; }
+    .scene-title h1 { font-size: 5.5rem; }
+    .scene-title .logo-big { width: 120px; height: 120px; font-size: 3.5rem; }
+    .scene-title p { font-size: 1.5rem; }
+    .scene-hook .hook-title { font-size: 3.2rem; }
+    .stats { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .stat .val { font-size: 2rem; }
+    .stat { padding: 20px; }
+    .caption {
+      bottom: 140px;
+      left: 48px;
+      right: 48px;
+      font-size: 1.35rem;
+      padding: 18px 22px;
+    }
+    .modal-mock { max-width: 100%; padding: 28px; }
+    .modal-mock h3 { font-size: 1.75rem; }
+    .item { grid-template-columns: auto 1fr; padding: 18px; margin-bottom: 14px; }
+    .item .actions, .item .price { grid-column: 1 / -1; display: flex; justify-content: space-between; margin-top: 8px; }
+    .thumb { width: 64px; height: 64px; font-size: 1.75rem; }
+    .item h3 { font-size: 1.2rem; }
+    .feature-stack { display: flex; flex-direction: column; gap: 14px; margin-top: 2rem; }
+    .feature-stack div {
+      padding: 18px 20px; border-radius: 16px; font-size: 1.25rem; font-weight: 600;
+      background: #1a1a2e; border: 1px solid rgba(168,85,247,0.35);
+    }
+    .cta-scene h2 { font-size: 3rem; }
+    .cta-scene .url { font-size: 1.35rem; word-break: break-all; padding: 16px 20px; }
+    .big-stat {
+      text-align: center; margin: 2rem 0;
+      padding: 32px; border-radius: 20px;
+      background: rgba(34,197,94,0.1); border: 2px solid rgba(34,197,94,0.4);
+    }
+    .big-stat .label { color: #8888a8; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .big-stat .num { font-size: 4rem; font-weight: 800; color: #22c55e; margin-top: 8px; }
+    .progress { height: 6px; }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+
+  <section class="scene scene-title active" data-duration="3500">
+    <div class="logo-big">🧠</div>
+    <h1><span>ROT</span>VAULT</h1>
+    <p>STOCK · SALES · PROFIT</p>
+    <div class="tag">STB Tracker</div>
+  </section>
+
+  <section class="scene scene-hook" data-duration="4500">
+    <h2 class="hook-title">Trading brainrots<br>but losing track<br>of profit?</h2>
+    <p class="hook-sub">This fixes that.</p>
+  </section>
+
+  <section class="scene" data-duration="5000">
+    <div class="header-mini"><div class="badge">🧠</div><h2><span>ROT</span>VAULT</h2></div>
+    <div class="stats">
+      <div class="stat"><label>Total Sold</label><span class="val green">$36,500</span></div>
+      <div class="stat"><label>Total Spent</label><span class="val red">$31,200</span></div>
+      <div class="stat"><label>Net Profit</label><span class="val green">+$5,300</span></div>
+      <div class="stat"><label>In Stock</label><span class="val purple">13</span></div>
+    </div>
+    <div class="caption">Know exactly what you've made 💰</div>
+  </section>
+
+  <section class="scene scene-center" data-duration="5500">
+    <div class="modal-mock">
+      <h3>+ Add Stock</h3>
+      <div class="picked"><div class="thumb">🚽</div><div><strong>Skibidi Toilet</strong> <span class="badge-r">GOAT</span><div class="meta">Toxic · Skibidi 5x</div></div></div>
+      <div class="mut-grid wide">
+        <div class="mut on"><span>☢️</span>Toxic</div>
+        <div class="mut"><span>💎</span>Void</div>
+        <div class="mut"><span>✨</span>Magic</div>
+      </div>
+      <div class="field"><label>Bought for</label><input value="$8,500" readonly></div>
+      <div class="field"><label>Asking</label><input value="$12,000" readonly></div>
+    </div>
+    <div class="caption">Full catalog · mutations · traits</div>
+  </section>
+
+  <section class="scene" data-duration="5000">
+    <div class="panel-title" style="font-size:1.5rem;margin-bottom:1rem">Your Stock</div>
+    <div class="item">
+      <div class="thumb">🚽</div>
+      <div><h3>Skibidi Toilet <span class="badge-r">GOAT</span></h3><div class="meta">Paid $8,500 · Ask $12k</div></div>
+      <div class="actions"><button class="btn btn-green" style="font-size:1rem;padding:12px 24px">Sell</button><span class="paid" style="color:#ef4444;font-weight:700">-$8,500 cost</span></div>
+    </div>
+    <div class="caption">Tap sell when you flip it 🔥</div>
+  </section>
+
+  <section class="scene scene-center" data-duration="5000">
+    <div class="modal-mock">
+      <h3>Mark as Sold ✅</h3>
+      <div class="picked"><div class="thumb">🚽</div><div><strong>Skibidi Toilet</strong></div></div>
+      <div class="field"><label>Sold for</label><input value="$12,000" readonly></div>
+      <div class="profit-box" style="font-size:1.25rem;padding:20px">Profit: <strong>+$3,500</strong></div>
+    </div>
+    <div class="caption">Profit math done for you</div>
+  </section>
+
+  <section class="scene" data-duration="4500">
+    <div class="big-stat">
+      <div class="label">Net Profit</div>
+      <div class="num">+$5,300</div>
+    </div>
+    <div class="feature-stack">
+      <div>✓ Every sale tracked</div>
+      <div>✓ Every purchase logged</div>
+      <div>✓ Real profit numbers</div>
+    </div>
+  </section>
+
+  <section class="scene cta-scene" data-duration="5000">
+    <div class="logo-big sm">🧠</div>
+    <h2>Try it FREE</h2>
+    <div class="url">brandinoc.github.io/brainrot-tracker</div>
+    <p style="color:#8888a8;margin-top:1.5rem;font-size:1.15rem">Link in bio · Steal The Brainrots</p>
+  </section>
+
+  <script src="promo-engine.js"></script>
+</body>
+</html>

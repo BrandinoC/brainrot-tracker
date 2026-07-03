@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <title>RotVault Promo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 1280px;
+      height: 720px;
+      overflow: hidden;
+      font-family: "Outfit", system-ui, sans-serif;
+      background: #0f0f1a;
+      color: #e8e8f0;
+    }
+    .scene {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+      padding: 48px 56px;
+    }
+    .scene.active { opacity: 1; }
+    .scene-title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.35), transparent),
+        radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.15), transparent),
+        #0f0f1a;
+    }
+    .logo-big {
+      width: 96px;
+      height: 96px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      background: linear-gradient(145deg, rgba(124, 58, 237, 0.4), rgba(59, 130, 246, 0.2));
+      border: 2px solid rgba(168, 85, 247, 0.6);
+      box-shadow: 0 0 40px rgba(168, 85, 247, 0.45);
+      margin-bottom: 1.5rem;
+    }
+    .scene-title h1 {
+      font-size: 4.5rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+    .scene-title h1 span:first-child {
+      background: linear-gradient(135deg, #c084fc, #7c3aed, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .scene-title p { color: #8888a8; font-size: 1.35rem; letter-spacing: 0.12em; }
+    .scene-title .tag {
+      margin-top: 2rem;
+      padding: 0.5rem 1.25rem;
+      border-radius: 999px;
+      border: 1px solid rgba(168, 85, 247, 0.5);
+      color: #a78bfa;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .caption {
+      position: absolute;
+      bottom: 36px;
+      left: 56px;
+      right: 56px;
+      padding: 14px 20px;
+      background: rgba(26, 26, 46, 0.92);
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      border-radius: 14px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #e8e8f0;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .caption strong { color: #a78bfa; }
+    .header-mini {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .header-mini .badge {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      background: linear-gradient(145deg, rgba(124,58,237,0.35), rgba(59,130,246,0.15));
+      border: 1px solid rgba(167,139,250,0.45);
+    }
+    .header-mini h2 { font-size: 1.75rem; font-weight: 800; letter-spacing: 0.06em; }
+    .header-mini h2 span { color: #c084fc; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 1.25rem;
+    }
+    .stat {
+      background: #1a1a2e;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+    .stat label { font-size: 0.72rem; color: #8888a8; text-transform: uppercase; letter-spacing: 0.06em; }
+    .stat .val { display: block; font-size: 1.5rem; font-weight: 700; margin-top: 4px; }
+    .stat .val.green { color: #22c55e; }
+    .stat .val.red { color: #ef4444; }
+    .stat .val.purple { color: #a78bfa; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 1rem; }
+    .tab {
+      padding: 10px 18px; border-radius: 12px; font-weight: 600; font-size: 0.9rem;
+      background: #1a1a2e; border: 1px solid rgba(255,255,255,0.08); color: #8888a8;
+    }
+    .tab.on { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+    .panel-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.35rem; }
+    .panel-desc { color: #8888a8; font-size: 0.875rem; margin-bottom: 1rem; }
+    .item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: center;
+      background: #1a1a2e;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+    .thumb {
+      width: 52px; height: 52px; border-radius: 12px;
+      background: linear-gradient(135deg, #22c55e33, #7c3aed33);
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+    }
+    .item h3 { font-size: 1rem; font-weight: 700; }
+    .item .meta { font-size: 0.78rem; color: #8888a8; margin-top: 2px; }
+    .badge-r { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.65rem; font-weight: 700; background: rgba(250,204,21,0.15); color: #facc15; margin-left: 6px; }
+    .badge-t { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.65rem; font-weight: 700; background: rgba(34,197,94,0.15); color: #86efac; margin-left: 4px; }
+    .price { text-align: right; }
+    .price .paid { color: #ef4444; font-weight: 700; font-size: 0.95rem; }
+    .price .ask { color: #8888a8; font-size: 0.78rem; }
+    .actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 8px 14px; border-radius: 10px; border: none; font-weight: 600; font-size: 0.8rem;
+      font-family: inherit; cursor: default;
+    }
+    .btn-green { background: #22c55e; color: #fff; }
+    .btn-purple { background: #7c3aed; color: #fff; }
+    .modal-mock {
+      max-width: 520px;
+      margin: 0 auto;
+      background: #1a1a2e;
+      border: 1px solid rgba(168,85,247,0.4);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.55), 0 0 40px rgba(124,58,237,0.15);
+    }
+    .modal-mock h3 { font-size: 1.35rem; margin-bottom: 0.5rem; }
+    .modal-mock .desc { color: #8888a8; font-size: 0.875rem; margin-bottom: 1.25rem; line-height: 1.5; }
+    .field { margin-bottom: 1rem; }
+    .field label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .field input {
+      width: 100%; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1); background: #12121f; color: #e8e8f0;
+      font-family: inherit; font-size: 0.95rem;
+    }
+    .picked {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px; border-radius: 12px;
+      background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.3);
+      margin-bottom: 1rem;
+    }
+    .mut-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+    .mut {
+      width: 56px; text-align: center; padding: 8px 4px; border-radius: 10px;
+      background: #12121f; border: 1px solid rgba(255,255,255,0.08); font-size: 0.65rem; color: #8888a8;
+    }
+    .mut.on { border-color: #7c3aed; background: rgba(124,58,237,0.2); color: #a78bfa; }
+    .mut span { display: block; font-size: 1.1rem; margin-bottom: 2px; }
+    .cta-scene {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      background: radial-gradient(ellipse at center, rgba(124,58,237,0.25), #0f0f1a 70%);
+    }
+    .cta-scene h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .cta-scene .url {
+      font-size: 1.65rem; font-weight: 700; color: #a78bfa;
+      padding: 14px 28px; border-radius: 14px;
+      border: 2px solid rgba(168,85,247,0.5);
+      background: rgba(26,26,46,0.8);
+      box-shadow: 0 0 30px rgba(168,85,247,0.3);
+      margin: 1rem 0 1.5rem;
+    }
+    .cta-scene ul {
+      list-style: none; text-align: left; color: #8888a8; font-size: 1.05rem; line-height: 2;
+    }
+    .cta-scene li::before { content: "✓ "; color: #22c55e; font-weight: 700; }
+    .progress {
+      position: fixed; bottom: 0; left: 0; height: 4px;
+      background: linear-gradient(90deg, #7c3aed, #ec4899);
+      transition: width 0.3s linear;
+      z-index: 99;
+    }
+    .highlight-ring {
+      position: absolute;
+      border: 3px solid #a855f7;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(168,85,247,0.6);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .scene.active .highlight-ring.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+
+  <section class="scene scene-title active" data-duration="3500">
+    <div class="logo-big">🧠</div>
+    <h1><span>ROT</span>VAULT</h1>
+    <p>STOCK · SALES · PROFIT</p>
+    <div class="tag">Steal The Brainrots Tracker</div>
+  </section>
+
+  <section class="scene" data-duration="4000">
+    <div class="header-mini">
+      <div class="badge">🧠</div>
+      <div>
+        <div style="font-size:0.65rem;color:#8888a8;letter-spacing:0.15em;font-weight:700">STEAL THE BRAINROTS</div>
+        <h2><span>ROT</span>VAULT</h2>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><label>Total Sold</label><span class="val green">$24,500</span></div>
+      <div class="stat"><label>Total Spent</label><span class="val red">$18,200</span></div>
+      <div class="stat"><label>Net Profit</label><span class="val green">+$6,300</span></div>
+      <div class="stat"><label>In Stock</label><span class="val purple">12</span></div>
+    </div>
+    <div class="tabs">
+      <div class="tab on">In Stock</div>
+      <div class="tab">Purchased</div>
+      <div class="tab">Sold</div>
+    </div>
+    <div class="panel-title">Current Stock</div>
+    <div class="panel-desc">Brainrots you own and haven't sold yet.</div>
+    <div class="caption"><strong>Step 1:</strong> See your profit, spending, and stock at a glance</div>
+  </section>
+
+  <section class="scene" data-duration="4500" style="display:flex;align-items:center;justify-content:center;padding-top:40px">
+    <div class="modal-mock">
+      <h3>Add Stock</h3>
+      <p class="desc">Search any brainrot, pick mutations &amp; traits, enter your buy price.</p>
+      <div class="picked">
+        <div class="thumb">🚽</div>
+        <div><strong>Skibidi Toilet</strong> <span class="badge-r">GOAT</span><div class="meta">Toxic · Skibidi trait</div></div>
+      </div>
+      <div class="field"><label>Mutation</label>
+        <div class="mut-grid">
+          <div class="mut"><span>⚪</span>Default</div>
+          <div class="mut on"><span>☢️</span>Toxic 11x</div>
+          <div class="mut"><span>💎</span>Void 13x</div>
+          <div class="mut"><span>✨</span>Magical</div>
+        </div>
+      </div>
+      <div class="field"><label>Purchase Price ($)</label><input value="8,500.00" readonly></div>
+      <div class="field"><label>Asking Price ($)</label><input value="12,000.00" readonly></div>
+      <button class="btn btn-purple" style="width:100%;padding:12px;margin-top:8px">Add to Stock</button>
+    </div>
+    <div class="caption"><strong>Step 2:</strong> Add stock with the full brainrot catalog, mutations &amp; traits</div>
+  </section>
+
+  <section class="scene" data-duration="4000">
+    <div class="header-mini"><div class="badge">🧠</div><h2><span>ROT</span>VAULT</h2></div>
+    <div class="stats">
+      <div class="stat"><label>Total Sold</label><span class="val green">$24,500</span></div>
+      <div class="stat"><label>Total Spent</label><span class="val red">$26,700</span></div>
+      <div class="stat"><label>Net Profit</label><span class="val red">-$2,200</span></div>
+      <div class="stat"><label>In Stock</label><span class="val purple">13</span></div>
+    </div>
+    <div class="tabs"><div class="tab on">In Stock</div><div class="tab">Purchased</div><div class="tab">Sold</div></div>
+    <div class="item">
+      <div class="thumb">🚽</div>
+      <div>
+        <h3>Skibidi Toilet <span class="badge-r">GOAT</span></h3>
+        <div class="meta">Toxic · Skibidi <span class="badge-t">Skibidi 5x</span></div>
+      </div>
+      <div class="price"><div class="paid">Paid $8,500</div><div class="ask">Ask $12,000</div></div>
+      <div class="actions"><button class="btn btn-green">Sell</button></div>
+    </div>
+    <div class="caption"><strong>Step 3:</strong> Your stock list updates — totals adjust automatically</div>
+  </section>
+
+  <section class="scene" data-duration="4000" style="display:flex;align-items:center;justify-content:center;padding-top:40px">
+    <div class="modal-mock">
+      <h3>Mark as Sold</h3>
+      <p class="desc">Sold <strong>Skibidi Toilet</strong> — enter your sale price.</p>
+      <div class="picked"><div class="thumb">🚽</div><div><strong>Skibidi Toilet</strong><div class="meta">Paid: $8,500.00</div></div></div>
+      <div class="field"><label>Sale Price ($)</label><input value="12,000.00" readonly></div>
+      <div style="padding:12px;border-radius:12px;background:rgba(34,197,94,0.12);color:#86efac;font-weight:700;text-align:center;margin:12px 0">
+        Profit on this sale: +$3,500.00
+      </div>
+      <button class="btn btn-green" style="width:100%;padding:12px">Confirm Sale</button>
+    </div>
+    <div class="caption"><strong>Step 4:</strong> Mark items sold — profit calculated instantly</div>
+  </section>
+
+  <section class="scene" data-duration="4000">
+    <div class="header-mini"><div class="badge">🧠</div><h2><span>ROT</span>VAULT</h2></div>
+    <div class="stats">
+      <div class="stat"><label>Total Sold</label><span class="val green">$36,500</span></div>
+      <div class="stat"><label>Total Spent</label><span class="val red">$26,700</span></div>
+      <div class="stat"><label>Net Profit</label><span class="val green">+$9,800</span></div>
+      <div class="stat"><label>In Stock</label><span class="val purple">12</span></div>
+    </div>
+    <div class="tabs"><div class="tab">In Stock</div><div class="tab">Purchased</div><div class="tab on">Sold</div></div>
+    <div class="item">
+      <div class="thumb">🚽</div>
+      <div>
+        <h3>Skibidi Toilet <span class="badge-r">GOAT</span></h3>
+        <div class="meta">Sold for $12,000 · Profit +$3,500</div>
+      </div>
+      <div class="price"><div class="paid" style="color:#22c55e">+$3,500</div></div>
+    </div>
+    <div class="caption"><strong>Step 5:</strong> Track every sale and watch your net profit grow</div>
+  </section>
+
+  <section class="scene cta-scene" data-duration="4500">
+    <div class="logo-big" style="width:72px;height:72px;font-size:2.2rem;margin-bottom:1rem">🧠</div>
+    <h2>Try RotVault Free</h2>
+    <div class="url">brandinoc.github.io/brainrot-tracker</div>
+    <ul>
+      <li>Full brainrot catalog with icons</li>
+      <li>Mutations, traits &amp; profit tracking</li>
+      <li>Works in browser — or desktop app</li>
+    </ul>
+  </section>
+
+  <script>
+    const scenes = [...document.querySelectorAll('.scene')];
+    const progress = document.getElementById('progress');
+    const totalMs = scenes.reduce((s, el) => s + Number(el.dataset.duration || 3000), 0);
+    let elapsed = 0;
+    let idx = 0;
+
+    function showScene(i) {
+      scenes.forEach((s, n) => s.classList.toggle('active', n === i));
+      progress.style.width = `${(elapsed / totalMs) * 100}%`;
+    }
+
+    function nextScene() {
+      if (idx >= scenes.length) {
+        window.__PROMO_DONE__ = true;
+        return;
+      }
+      showScene(idx);
+      const dur = Number(scenes[idx].dataset.duration || 3000);
+      idx += 1;
+      elapsed += dur;
+      setTimeout(nextScene, dur);
+    }
+
+    window.__PROMO_TOTAL_MS__ = totalMs;
+    nextScene();
+  </script>
+</body>
+</html>

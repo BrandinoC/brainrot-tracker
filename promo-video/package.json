@@ -1,0 +1,13 @@
+{
+  "name": "rotvault-promo",
+  "private": true,
+  "scripts": {
+    "record": "node record-promo.js --short",
+    "record:long": "node record-promo.js --long",
+    "record:vertical": "node record-promo.js --vertical",
+    "record:all": "node record-promo.js --all"
+  },
+  "dependencies": {
+    "puppeteer": "^24.0.0"
+  }
+}
