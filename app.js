@@ -679,14 +679,15 @@ function renderStats() {
     profitEl.classList.add('locked');
     stockEl.classList.add('locked');
 
-    document.querySelector('[data-stat="totalMade"] .stat-hint')?.textContent =
-      'Get the full version to track sales';
-    document.querySelector('[data-stat="totalSpent"] .stat-hint')?.textContent =
-      'Get the full version to track spending';
-    $('#net-profit-card .stat-hint')?.textContent =
-      'Get the full version to track profit';
-    document.querySelector('[data-stat="inStock"] .stat-hint')?.textContent =
-      'Get the full version to track stock';
+    const totalMadeHint = document.querySelector('[data-stat="totalMade"] .stat-hint');
+    const totalSpentHint = document.querySelector('[data-stat="totalSpent"] .stat-hint');
+    const netProfitHint = $('#net-profit-card .stat-hint');
+    const inStockHint = document.querySelector('[data-stat="inStock"] .stat-hint');
+
+    if (totalMadeHint) totalMadeHint.textContent = 'Get the full version to track sales';
+    if (totalSpentHint) totalSpentHint.textContent = 'Get the full version to track spending';
+    if (netProfitHint) netProfitHint.textContent = 'Get the full version to track profit';
+    if (inStockHint) inStockHint.textContent = 'Get the full version to track stock';
 
     return;
   }
