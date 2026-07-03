@@ -1517,11 +1517,9 @@ function getAppVersion() {
   return document.querySelector('meta[name="app-version"]')?.content?.trim() || '0';
 }
 
-function getUpdateCheckUrl() {
-  if (window.rotvaultDesktop?.isDesktopApp) {
-    return 'https://brandinoc.github.io/brainrot-tracker/version.json';
-  }
-  return 'version.json';
+function getWebVersion() {
+  return document.querySelector('meta[name="web-version"]')?.content?.trim()
+    || getAppVersion();
 }
 
 function initUpdateChecker() {
@@ -1530,14 +1528,14 @@ function initUpdateChecker() {
   const refreshBtn = $('#update-refresh');
   const dismissBtn = $('#update-dismiss');
   const isDesktopApp = Boolean(window.rotvaultDesktop?.isDesktopApp);
-  if (!banner || (location.protocol === 'file:' && !isDesktopApp)) return;
+  if (!banner || isDesktopApp || (location.protocol === 'file:' && !isDesktopApp)) return;
 
-  const currentVersion = getAppVersion();
+  const currentVersion = getWebVersion();
   let latestVersion = null;
 
   async function checkForUpdate() {
     try {
-      const res = await fetch(`${getUpdateCheckUrl()}?ts=${Date.now()}`, { cache: 'no-store' });
+      const res = await fetch(`version.json?ts=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) return;
       const data = await res.json();
       latestVersion = data?.version?.trim();
@@ -1547,12 +1545,7 @@ function initUpdateChecker() {
       }
       if (sessionStorage.getItem('update-dismissed') === latestVersion) return;
 
-      if (isDesktopApp) {
-        const msg = banner.querySelector('p');
-        if (msg) {
-          msg.textContent = `A new version is available (v${latestVersion}). Download the latest RotVault installer to get new features.`;
-        }
-      } else if (versionLabel) {
+      if (versionLabel) {
         versionLabel.textContent = `(v${latestVersion})`;
       }
       banner.classList.remove('hidden');
@@ -1562,10 +1555,6 @@ function initUpdateChecker() {
   }
 
   refreshBtn?.addEventListener('click', () => {
-    if (isDesktopApp) {
-      window.open('https://brandinoc.github.io/brainrot-tracker/', '_blank');
-      return;
-    }
     location.reload();
   });
 
