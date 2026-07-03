@@ -71,20 +71,41 @@ body::after {
   top: var(--y);
   width: var(--size);
   height: var(--size);
-  opacity: 0.09;
+  opacity: 0.22;
   background-image: var(--sheet);
   background-repeat: no-repeat;
   background-size: 900% 900%;
   background-position: var(--bg-x) var(--bg-y);
   animation: floatDrift var(--dur, 30s) ease-in-out infinite;
   animation-delay: var(--delay, 0s);
-  filter: saturate(1.15);
+  filter: saturate(1.35) drop-shadow(0 0 14px rgba(124, 58, 237, 0.45));
   will-change: transform;
+  border-radius: 14%;
 }
 
 .float-rot--soft {
-  opacity: 0.06;
-  filter: saturate(1.1) blur(0.5px);
+  opacity: 0.16;
+  filter: saturate(1.2) drop-shadow(0 0 18px rgba(124, 58, 237, 0.35));
+}
+
+.float-rot--bright {
+  opacity: 0.3;
+  filter: saturate(1.45) drop-shadow(0 0 20px rgba(167, 139, 250, 0.55));
+}
+
+.float-rot--gold {
+  --sheet: url("https://stbhub.gg/assets/images/brainrots/types/gold/Gold.png");
+  filter: saturate(1.4) drop-shadow(0 0 16px rgba(250, 204, 21, 0.4));
+}
+
+.float-rot--diamond {
+  --sheet: url("https://stbhub.gg/assets/images/brainrots/types/diamond/Diamond.png");
+  filter: saturate(1.4) drop-shadow(0 0 16px rgba(96, 165, 250, 0.45));
+}
+
+.float-rot--galaxy {
+  --sheet: url("https://stbhub.gg/assets/images/brainrots/types/galaxy/Galaxy.png");
+  filter: saturate(1.5) drop-shadow(0 0 18px rgba(192, 132, 252, 0.5));
 }
 
 .float-glow {
@@ -96,40 +117,44 @@ body::after {
   border-radius: 50%;
   animation: glowPulse 14s ease-in-out infinite;
   animation-delay: var(--delay, 0s);
-  opacity: 0.35;
+  opacity: 0.5;
 }
 
 .float-glow--purple {
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.18), transparent 70%);
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.28), transparent 70%);
 }
 
 .float-glow--blue {
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.14), transparent 70%);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.22), transparent 70%);
+}
+
+.float-glow--pink {
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.18), transparent 70%);
 }
 
 @keyframes floatDrift {
   0%, 100% {
-    transform: translate(0, 0) rotate(0deg);
+    transform: translate(0, 0) rotate(0deg) scale(1);
   }
   25% {
-    transform: translate(12px, -18px) rotate(4deg);
+    transform: translate(18px, -24px) rotate(6deg) scale(1.04);
   }
   50% {
-    transform: translate(-8px, -28px) rotate(-3deg);
+    transform: translate(-12px, -36px) rotate(-5deg) scale(1.02);
   }
   75% {
-    transform: translate(-14px, -10px) rotate(2deg);
+    transform: translate(-20px, -14px) rotate(4deg) scale(1.05);
   }
 }
 
 @keyframes glowPulse {
   0%, 100% {
     transform: scale(1);
-    opacity: 0.3;
+    opacity: 0.45;
   }
   50% {
-    transform: scale(1.12);
-    opacity: 0.45;
+    transform: scale(1.15);
+    opacity: 0.62;
   }
 }
 
@@ -137,6 +162,20 @@ body::after {
   .float-rot,
   .float-glow {
     animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .float-rot {
+    opacity: 0.18;
+  }
+
+  .float-rot--bright {
+    opacity: 0.24;
+  }
+
+  .float-rot:nth-child(n+11) {
+    display: none;
   }
 }
 
