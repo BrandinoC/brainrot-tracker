@@ -1517,11 +1517,6 @@ function getAppVersion() {
   return document.querySelector('meta[name="app-version"]')?.content?.trim() || '0';
 }
 
-function getWebVersion() {
-  return document.querySelector('meta[name="web-version"]')?.content?.trim()
-    || getAppVersion();
-}
-
 function initUpdateChecker() {
   const banner = $('#update-banner');
   const versionLabel = $('#update-version-label');
@@ -1530,7 +1525,7 @@ function initUpdateChecker() {
   const isDesktopApp = Boolean(window.rotvaultDesktop?.isDesktopApp);
   if (!banner || isDesktopApp || (location.protocol === 'file:' && !isDesktopApp)) return;
 
-  const currentVersion = getWebVersion();
+  const currentVersion = getAppVersion();
   let latestVersion = null;
 
   async function checkForUpdate() {
