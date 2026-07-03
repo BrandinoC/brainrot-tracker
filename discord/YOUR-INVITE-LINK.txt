@@ -1,0 +1,8 @@
+Paste your permanent Discord invite link here after you create the server.
+
+Example: https://discord.gg/abc123xyz
+
+Then also paste it into index.html on this line:
+  <meta name="discord-invite" content="PASTE HERE">
+
+Save, push to GitHub, and the website will show a "Join Discord" button.

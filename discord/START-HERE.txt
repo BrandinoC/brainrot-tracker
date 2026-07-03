@@ -1,0 +1,17 @@
+ROTVALUT DISCORD — START HERE
+==============================
+
+Double-click:  Open Discord Setup.bat  (in the brainrot-tracker folder)
+
+That opens:
+  1. This step-by-step guide in your browser
+  2. Discord in your browser
+  3. The discord folder (copy-paste text files)
+
+YOUR ONLY JOB:
+  1. Create the server in Discord (follow the guide)
+  2. Copy-paste the text into each channel (files in discord/copy/)
+  3. Copy your invite link into discord/YOUR-INVITE-LINK.txt
+  4. Paste the same link into index.html (search for discord-invite)
+
+Done!

@@ -646,6 +646,15 @@ function initDemoMode() {
   if (!isDemoMode()) return;
   document.documentElement.classList.add('demo-mode');
   $('#demo-banner')?.classList.remove('hidden');
+  initDiscordLink();
+}
+
+function initDiscordLink() {
+  const url = document.querySelector('meta[name="discord-invite"]')?.content?.trim();
+  const link = $('#demo-discord-link');
+  if (!link || !url || !/^https?:\/\//i.test(url)) return;
+  link.href = url;
+  link.classList.remove('hidden');
 }
 
 function defaultStatAdjustments() {

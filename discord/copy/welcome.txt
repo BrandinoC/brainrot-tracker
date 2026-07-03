@@ -1,0 +1,14 @@
+Welcome to **RotVault** 🧠
+
+Track your Brainrot stock, sales, and profit for Steal The Brainrots.
+
+**Try free (browser demo)**
+https://brandinoc.github.io/brainrot-tracker/
+
+**Full desktop app**
+Download from your Gumroad purchase email → `RotVault Setup 1.0.0.exe`
+
+**Need help?** → <#help>
+**Show off your hauls** → <#show-your-haul>
+
+Glad you're here!

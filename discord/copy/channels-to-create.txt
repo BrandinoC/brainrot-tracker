@@ -1,0 +1,27 @@
+Create these channels in Discord (right-click server → Create Category / Create Channel)
+
+=== CATEGORY: INFO ===
+#welcome          (text) — paste welcome.txt
+#rules            (text) — paste rules.txt, slow mode optional
+#announcements    (text) — paste announcements-pin.txt, @everyone can view only you can post
+#download         (text) — paste download-pin.txt, pin that message
+
+=== CATEGORY: SUPPORT ===
+#help             (text) — "Ask anything about RotVault"
+#bug-reports      (text) — "Describe bugs + what you were doing"
+#suggestions      (text) — "Feature ideas"
+
+=== CATEGORY: COMMUNITY ===
+#general          (text) — "Chat about Brainrots"
+#show-your-haul   (text) — "Screenshots of your stock & profits"
+#brainrot-talk    (text) — "Steal The Brainrots game chat"
+
+=== ROLES (Server Settings → Roles) ===
+@Buyer            — pink/purple — paid RotVault owners (give manually for now)
+@Demo User        — gray — optional, everyone on join
+@Verified         — optional later
+
+=== SERVER SETTINGS TIPS ===
+• Upload icon: rotvault-thumbnail.png (in brainrot-tracker folder)
+• Invite link: never expires, unlimited uses
+• Verification level: Low or Medium
