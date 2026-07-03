@@ -479,6 +479,26 @@ body::after {
   letter-spacing: 0.04em;
 }
 
+.header-discord-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.55rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: #5865f2;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: filter 0.15s;
+}
+
+.header-discord-link:hover {
+  filter: brightness(1.08);
+  color: #fff;
+}
+
 /* Stats */
 .stats-bar {
   display: grid;
