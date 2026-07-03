@@ -25,6 +25,8 @@ const catalog = {
   traitIconStems: {},
   traitIconBase: '/assets/images/traits',
   ready: false,
+  loading: null,
+  supportLoading: null,
 };
 
 let sellingItemId = null;
@@ -33,6 +35,7 @@ let pickerSelection = null;
 let selectedMutationSlug = 'default';
 let selectedTraitIds = new Set();
 let editingStatKey = null;
+let traitsGridRendered = false;
 
 const STAT_CONFIG = {
   totalMade: {
@@ -54,6 +57,38 @@ const STAT_CONFIG = {
 
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
+
+function debounce(fn, waitMs) {
+  let timeoutId = null;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(...args), waitMs);
+  };
+}
+
+function runWhenIdle(fn, timeoutMs = 2000) {
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(fn, { timeout: timeoutMs });
+    return;
+  }
+  setTimeout(fn, 50);
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+async function fetchJson(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
 
 function getPrimarySlug(brainrot) {
   const styles = brainrot.styles || [];
@@ -209,9 +244,16 @@ function buildCatalogEntry(brainrot) {
     name: brainrot.name,
     slug,
     rarity: brainrot.rarity || 'Unknown',
-    atlas: resolveBrainrotAtlas(brainrot, 'default'),
     raw: brainrot,
   };
+}
+
+function getEntryAtlas(entry) {
+  if (!entry) return null;
+  if (entry._atlas === undefined) {
+    entry._atlas = resolveBrainrotAtlas(entry.raw, 'default');
+  }
+  return entry._atlas;
 }
 
 function formatSlugLabel(slug) {
@@ -227,16 +269,12 @@ function formatMultiplier(mult) {
   return Number.isInteger(mult) ? String(mult) : mult.toFixed(1);
 }
 
-function loadMutationsCatalog() {
-  let data = window.BRAINROT_TYPES_CATALOG;
+function applyMutationsCatalog(data) {
+  const source = data?.types?.length
+    ? data
+    : { types: [{ slug: 'default', name: 'Default', multiplier: 1 }] };
 
-  if (!data?.types) {
-    data = {
-      types: [{ slug: 'default', name: 'Default', multiplier: 1 }],
-    };
-  }
-
-  catalog.mutations = data.types.map((t) => ({
+  catalog.mutations = source.types.map((t) => ({
     slug: t.slug,
     name: t.name || formatSlugLabel(t.slug),
     multiplier: t.multiplier ?? null,
@@ -246,6 +284,10 @@ function loadMutationsCatalog() {
   for (const mutation of catalog.mutations) {
     catalog.mutationBySlug.set(mutation.slug, mutation);
   }
+}
+
+function loadMutationsCatalog() {
+  applyMutationsCatalog(window.BRAINROT_TYPES_CATALOG);
 }
 
 function normalizeTraitName(name) {
@@ -262,9 +304,7 @@ function getTraitIconUrl(trait) {
   return `${STBHUB_ORIGIN}${catalog.traitIconBase}/${encodeURIComponent(stem)}.png`;
 }
 
-function loadTraitsCatalog() {
-  let data = window.TRAITS_CATALOG;
-
+function applyTraitsCatalog(data) {
   if (!data?.rows) {
     catalog.traits = [];
     catalog.traitById.clear();
@@ -291,9 +331,13 @@ function loadTraitsCatalog() {
   }
 }
 
+function loadTraitsCatalog() {
+  applyTraitsCatalog(window.TRAITS_CATALOG);
+}
+
 function renderTraitsGrid() {
   const grid = $('#traits-grid');
-  if (!grid) return;
+  if (!grid || traitsGridRendered) return;
 
   grid.innerHTML = '';
 
@@ -329,6 +373,13 @@ function renderTraitsGrid() {
     btn.addEventListener('click', () => toggleTrait(trait.id));
     grid.appendChild(btn);
   }
+
+  traitsGridRendered = true;
+}
+
+async function ensureTraitsGrid() {
+  await loadSupportCatalogs();
+  renderTraitsGrid();
 }
 
 function updateTraitTileStates() {
@@ -426,45 +477,100 @@ function normalizeNameKey(name) {
   return String(name || '').toLowerCase().trim();
 }
 
-async function loadCatalog() {
-  let data = null;
+async function loadSupportCatalogs() {
+  if (catalog.supportLoading) return catalog.supportLoading;
 
-  if (Array.isArray(window.BRAINROTS_CATALOG)) {
-    data = window.BRAINROTS_CATALOG;
-  }
-
-  if (!data) {
-    for (const url of CATALOG_SOURCES) {
+  catalog.supportLoading = (async () => {
+    if (!catalog.mutations.length) {
       try {
-        const res = await fetch(url);
-        if (res.ok) {
-          data = await res.json();
-          break;
-        }
+        applyMutationsCatalog(await fetchJson('data/brainrot_types.json'));
       } catch {
-        /* try next source */
+        try {
+          await loadScript('types-data.js');
+          loadMutationsCatalog();
+        } catch {
+          applyMutationsCatalog(null);
+        }
       }
     }
+
+    if (!catalog.traits.length) {
+      try {
+        applyTraitsCatalog(await fetchJson('data/traits.json'));
+      } catch {
+        try {
+          await loadScript('traits-data.js');
+          loadTraitsCatalog();
+        } catch {
+          applyTraitsCatalog(null);
+        }
+      }
+    }
+  })();
+
+  return catalog.supportLoading;
+}
+
+async function loadCatalog() {
+  if (catalog.ready) return;
+  if (catalog.loading) return catalog.loading;
+
+  catalog.loading = (async () => {
+    let data = null;
+
+    if (Array.isArray(window.BRAINROTS_CATALOG)) {
+      data = window.BRAINROTS_CATALOG;
+    }
+
+    if (!data) {
+      for (const url of CATALOG_SOURCES) {
+        try {
+          data = await fetchJson(url);
+          break;
+        } catch {
+          /* try next source */
+        }
+      }
+    }
+
+    if (!data) {
+      try {
+        await loadScript('catalog-data.js');
+        data = window.BRAINROTS_CATALOG;
+      } catch {
+        /* offline fallback failed */
+      }
+    }
+
+    if (!Array.isArray(data)) {
+      console.warn('Could not load brainrot catalog.');
+      return;
+    }
+
+    await loadSupportCatalogs();
+
+    catalog.list = data.map(buildCatalogEntry).sort((a, b) => a.name.localeCompare(b.name));
+
+    catalog.bySlug.clear();
+    catalog.byName.clear();
+    for (const entry of catalog.list) {
+      catalog.bySlug.set(entry.slug, entry);
+      catalog.byName.set(normalizeNameKey(entry.name), entry);
+    }
+
+    catalog.ready = true;
+
+    if (state.items.length) {
+      backfillItemImages();
+      renderAll();
+    }
+  })();
+
+  try {
+    await catalog.loading;
+  } finally {
+    catalog.loading = null;
   }
-
-  if (!Array.isArray(data)) {
-    console.warn('Could not load brainrot catalog.');
-    return;
-  }
-
-  loadMutationsCatalog();
-  catalog.list = data.map(buildCatalogEntry).sort((a, b) => a.name.localeCompare(b.name));
-
-  catalog.bySlug.clear();
-  catalog.byName.clear();
-  for (const entry of catalog.list) {
-    catalog.bySlug.set(entry.slug, entry);
-    catalog.byName.set(normalizeNameKey(entry.name), entry);
-  }
-
-  catalog.ready = true;
-  backfillItemImages();
-  renderAll();
 }
 
 function findCatalogEntry(item) {
@@ -1160,7 +1266,7 @@ function renderPickerResults(results) {
     btn.className = 'picker-result';
     btn.setAttribute('role', 'option');
 
-    btn.appendChild(createAtlasThumb(entry.atlas, 'atlas-thumb--sm'));
+    btn.appendChild(createAtlasThumb(getEntryAtlas(entry), 'atlas-thumb--sm'));
 
     const text = document.createElement('span');
     const name = document.createElement('span');
@@ -1180,18 +1286,43 @@ function renderPickerResults(results) {
   container.classList.remove('hidden');
 }
 
+function renderPickerLoading() {
+  const container = $('#picker-results');
+  if (!container) return;
+  container.innerHTML = '<p class="picker-status">Loading brainrots…</p>';
+  container.classList.remove('hidden');
+}
+
+async function ensureCatalogReady() {
+  if (catalog.ready) return true;
+  renderPickerLoading();
+  await loadCatalog();
+  return catalog.ready;
+}
+
 function initPicker() {
   const searchInput = $('#purchase-search');
   const resultsEl = $('#picker-results');
 
+  const showPickerResults = () => {
+    renderPickerResults(filterBrainrots(searchInput.value));
+  };
+
+  const debouncedPickerInput = debounce(showPickerResults, 120);
+
   searchInput.addEventListener('input', () => {
     if (!catalog.ready) return;
-    renderPickerResults(filterBrainrots(searchInput.value));
+    debouncedPickerInput();
   });
 
   searchInput.addEventListener('focus', () => {
-    if (!catalog.ready) return;
-    renderPickerResults(filterBrainrots(searchInput.value));
+    if (catalog.ready) {
+      showPickerResults();
+      return;
+    }
+    ensureCatalogReady().then((ready) => {
+      if (ready) showPickerResults();
+    });
   });
 
   $('#picker-clear').addEventListener('click', () => {
@@ -1210,8 +1341,16 @@ function openPurchaseModal() {
   $('#purchase-form').reset();
   resetPicker();
   $('#purchase-modal').showModal();
+  ensureTraitsGrid();
+  loadCatalog();
   if (catalog.ready) {
     $('#purchase-search').focus();
+  } else {
+    loadCatalog().then(() => {
+      if ($('#purchase-modal').open) {
+        $('#purchase-search').focus();
+      }
+    });
   }
 }
 
@@ -1437,8 +1576,11 @@ function initUpdateChecker() {
     banner.classList.add('hidden');
   });
 
-  checkForUpdate();
-  window.setInterval(checkForUpdate, 5 * 60 * 1000);
+  runWhenIdle(() => {
+    checkForUpdate();
+    window.setInterval(checkForUpdate, 5 * 60 * 1000);
+  }, 5000);
+
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') checkForUpdate();
   });
@@ -1664,16 +1806,18 @@ function initDesktopShell() {
   document.querySelector('.settings-preset[data-preset="purple"]')?.classList.add('is-active');
 }
 
-loadData();
-initDemoMode();
-initTabs();
-initModals();
-initPicker();
-initStatControls();
-initUpdateChecker();
-initTheme();
-initDesktopShell();
-loadTraitsCatalog();
-renderTraitsGrid();
-loadCatalog();
-renderAll();
+function bootstrap() {
+  loadData();
+  initDemoMode();
+  initTabs();
+  initModals();
+  initPicker();
+  initStatControls();
+  initTheme();
+  initDesktopShell();
+  renderAll();
+  initUpdateChecker();
+  runWhenIdle(() => loadCatalog(), 1500);
+}
+
+bootstrap();

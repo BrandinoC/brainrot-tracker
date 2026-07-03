@@ -173,6 +173,7 @@ body::after {
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
+  contain: strict;
 }
 
 .float-rot {
@@ -182,41 +183,35 @@ body::after {
   top: var(--y);
   width: var(--size);
   height: var(--size);
-  opacity: 0.22;
+  opacity: 0.2;
   background-image: var(--sheet);
   background-repeat: no-repeat;
   background-size: 900% 900%;
   background-position: var(--bg-x) var(--bg-y);
   animation: floatDrift var(--dur, 30s) ease-in-out infinite;
   animation-delay: var(--delay, 0s);
-  filter: saturate(1.35) drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 45%, transparent));
-  will-change: transform;
+  filter: saturate(1.2);
   border-radius: 14%;
 }
 
 .float-rot--soft {
-  opacity: 0.16;
-  filter: saturate(1.2) drop-shadow(0 0 18px color-mix(in srgb, var(--accent) 35%, transparent));
+  opacity: 0.14;
 }
 
 .float-rot--bright {
-  opacity: 0.3;
-  filter: saturate(1.45) drop-shadow(0 0 20px rgba(167, 139, 250, 0.55));
+  opacity: 0.26;
 }
 
 .float-rot--gold {
   --sheet: url("https://stbhub.gg/assets/images/brainrots/types/gold/Gold.png");
-  filter: saturate(1.4) drop-shadow(0 0 16px rgba(250, 204, 21, 0.4));
 }
 
 .float-rot--diamond {
   --sheet: url("https://stbhub.gg/assets/images/brainrots/types/diamond/Diamond.png");
-  filter: saturate(1.4) drop-shadow(0 0 16px rgba(96, 165, 250, 0.45));
 }
 
 .float-rot--galaxy {
   --sheet: url("https://stbhub.gg/assets/images/brainrots/types/galaxy/Galaxy.png");
-  filter: saturate(1.5) drop-shadow(0 0 18px rgba(192, 132, 252, 0.5));
 }
 
 .float-glow {
@@ -228,7 +223,7 @@ body::after {
   border-radius: 50%;
   animation: glowPulse 14s ease-in-out infinite;
   animation-delay: var(--delay, 0s);
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 .float-glow--purple {
@@ -278,14 +273,18 @@ body::after {
 
 @media (max-width: 640px) {
   .float-rot {
-    opacity: 0.18;
+    opacity: 0.16;
   }
 
   .float-rot--bright {
-    opacity: 0.24;
+    opacity: 0.22;
   }
 
-  .float-rot:nth-child(n+11) {
+  .float-rot:nth-child(n+5) {
+    display: none;
+  }
+
+  .float-glow:nth-child(n+2) {
     display: none;
   }
 }
@@ -623,6 +622,10 @@ body::after {
 /* Panels */
 .tab-panel {
   animation: fadeIn 0.25s ease;
+}
+
+.tab-panel[hidden] {
+  content-visibility: hidden;
 }
 
 @keyframes fadeIn {
@@ -1045,6 +1048,14 @@ body::after {
 
 .picker-search-wrap input[type="search"]:focus {
   border-color: var(--accent);
+}
+
+.picker-status {
+  margin: 0;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-align: center;
 }
 
 .picker-results {
