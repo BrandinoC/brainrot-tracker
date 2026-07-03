@@ -679,13 +679,13 @@ function renderStats() {
     profitEl.classList.add('locked');
     stockEl.classList.add('locked');
 
-    document.querySelector('[data-stat="totalMade"] .stat-hint').textContent =
+    document.querySelector('[data-stat="totalMade"] .stat-hint')?.textContent =
       'Get the full version to track sales';
-    document.querySelector('[data-stat="totalSpent"] .stat-hint').textContent =
+    document.querySelector('[data-stat="totalSpent"] .stat-hint')?.textContent =
       'Get the full version to track spending';
-    $('#net-profit-card .stat-hint').textContent =
+    $('#net-profit-card .stat-hint')?.textContent =
       'Get the full version to track profit';
-    document.querySelector('[data-stat="inStock"] .stat-hint').textContent =
+    document.querySelector('[data-stat="inStock"] .stat-hint')?.textContent =
       'Get the full version to track stock';
 
     return;
@@ -1674,5 +1674,5 @@ initTheme();
 initDesktopShell();
 loadTraitsCatalog();
 renderTraitsGrid();
-renderAll();
 loadCatalog();
+renderAll();
