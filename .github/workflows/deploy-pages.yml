@@ -6,9 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
@@ -16,9 +14,6 @@ concurrency:
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,31 +28,10 @@ jobs:
           cp electron/icon.png _site/electron/
           cp rotvault-thumbnail.png rotvault-promo.png _site/ 2>/dev/null || true
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: _site
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-        continue-on-error: true
-
-      - name: Wait before retry
-        if: steps.deployment.outcome == 'failure'
-        run: sleep 30
-
-      - name: Deploy to GitHub Pages (retry)
-        id: deployment_retry
-        if: steps.deployment.outcome == 'failure'
-        uses: actions/deploy-pages@v4
-        continue-on-error: true
-
-      - name: Verify deployment succeeded
-        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome != 'success'
-        run: |
-          echo "GitHub Pages deploy failed after retry. Re-run the workflow from the Actions tab."
-          exit 1
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          publish_branch: gh-pages
+          force_orphan: true
