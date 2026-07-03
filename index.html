@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Track your Brainrot sales, purchases, stock, and profit from Steal The Brainrots.">
+  <meta name="app-version" content="1.0.0">
+  <title>Brainrot Tracker | Steal The Brainrots</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg-decoration" aria-hidden="true">
+    <div class="float-rot" style="--x: 8%; --y: 18%; --size: 72px; --delay: 0s; --dur: 28s; --bg-x: 0%; --bg-y: 0%"></div>
+    <div class="float-rot" style="--x: 82%; --y: 12%; --size: 56px; --delay: -6s; --dur: 34s; --bg-x: 62.5%; --bg-y: 0%"></div>
+    <div class="float-rot" style="--x: 15%; --y: 72%; --size: 64px; --delay: -12s; --dur: 26s; --bg-x: 25%; --bg-y: 12.5%"></div>
+    <div class="float-rot" style="--x: 88%; --y: 68%; --size: 48px; --delay: -4s; --dur: 32s; --bg-x: 12.5%; --bg-y: 25%"></div>
+    <div class="float-rot" style="--x: 52%; --y: 85%; --size: 40px; --delay: -18s; --dur: 38s; --bg-x: 12.5%; --bg-y: 37.5%"></div>
+    <div class="float-rot float-rot--soft" style="--x: 70%; --y: 42%; --size: 88px; --delay: -9s; --dur: 30s; --bg-x: 37.5%; --bg-y: 0%"></div>
+    <div class="float-glow float-glow--purple" style="--x: 20%; --y: 40%; --size: 180px; --delay: 0s"></div>
+    <div class="float-glow float-glow--blue" style="--x: 75%; --y: 55%; --size: 140px; --delay: -5s"></div>
+  </div>
+  <div class="app">
+    <div class="update-banner hidden" id="update-banner" role="alert">
+      <p>A new version is available <span id="update-version-label"></span>. Refresh to get the latest features.</p>
+      <div class="update-banner-actions">
+        <button type="button" class="btn btn-sm btn-primary" id="update-refresh">Refresh now</button>
+        <button type="button" class="btn btn-sm btn-ghost" id="update-dismiss">Later</button>
+      </div>
+    </div>
+    <header class="header">
+      <div class="header-brand">
+        <span class="logo">🧠</span>
+        <div>
+          <h1>Brainrot Tracker</h1>
+          <p class="subtitle">Steal The Brainrots · Profit &amp; Stock</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="stats-bar" aria-label="Financial summary">
+      <div class="stat-card" data-stat="totalMade">
+        <div class="stat-card-top">
+          <span class="stat-label">Total Sold</span>
+          <div class="stat-actions">
+            <button type="button" class="stat-btn" data-action="edit" aria-label="Edit Total Sold" title="Edit">✎</button>
+            <button type="button" class="stat-btn" data-action="reset" aria-label="Reset Total Sold" title="Reset to $0">↺</button>
+          </div>
+        </div>
+        <span class="stat-value made" id="total-made">$0.00</span>
+        <span class="stat-hint">Goes up when you sell</span>
+      </div>
+      <div class="stat-card" data-stat="totalSpent">
+        <div class="stat-card-top">
+          <span class="stat-label">Total Spent</span>
+          <div class="stat-actions">
+            <button type="button" class="stat-btn" data-action="edit" aria-label="Edit Total Spent" title="Edit">✎</button>
+            <button type="button" class="stat-btn" data-action="reset" aria-label="Reset Total Spent" title="Reset to $0">↺</button>
+          </div>
+        </div>
+        <span class="stat-value spent" id="total-spent">$0.00</span>
+        <span class="stat-hint">Goes up when you buy stock</span>
+      </div>
+      <div class="stat-card stat-card-profit" id="net-profit-card">
+        <span class="stat-label">Net Profit</span>
+        <span class="stat-value profit" id="net-profit">$0.00</span>
+        <span class="stat-hint">Goes down when you buy · up when you sell</span>
+      </div>
+      <div class="stat-card" data-stat="inStock">
+        <div class="stat-card-top">
+          <span class="stat-label">In Stock</span>
+          <div class="stat-actions">
+            <button type="button" class="stat-btn" data-action="edit" aria-label="Edit In Stock count" title="Edit">✎</button>
+            <button type="button" class="stat-btn" data-action="reset" aria-label="Reset In Stock" title="Reset to 0">↺</button>
+          </div>
+        </div>
+        <span class="stat-value stock-count" id="stock-count">0</span>
+      </div>
+    </section>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab active" role="tab" aria-selected="true" data-tab="stock">In Stock</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="purchased">Purchased</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="sold">Sold</button>
+    </nav>
+
+    <main class="main-content">
+      <!-- In Stock Tab -->
+      <section class="tab-panel active" id="panel-stock" role="tabpanel">
+        <div class="panel-header">
+          <h2>Current Stock</h2>
+          <button class="btn btn-primary" id="btn-add-purchase">+ Add Stock</button>
+        </div>
+        <p class="panel-desc">Brainrots you own and haven't sold yet.</p>
+        <div class="item-list" id="stock-list"></div>
+        <p class="empty-state hidden" id="stock-empty">No items in stock. Add stock to get started!</p>
+      </section>
+
+      <!-- Purchased Tab -->
+      <section class="tab-panel" id="panel-purchased" role="tabpanel" hidden>
+        <div class="panel-header">
+          <h2>All Purchases</h2>
+          <button class="btn btn-primary" id="btn-add-purchase-2">+ Add Purchase</button>
+        </div>
+        <p class="panel-desc">Every Brainrot you've bought, including sold ones.</p>
+        <div class="item-list" id="purchased-list"></div>
+        <p class="empty-state hidden" id="purchased-empty">No purchases yet.</p>
+      </section>
+
+      <!-- Sold Tab -->
+      <section class="tab-panel" id="panel-sold" role="tabpanel" hidden>
+        <div class="panel-header">
+          <h2>Sold Items</h2>
+        </div>
+        <p class="panel-desc">Completed sales and profit per item.</p>
+        <div class="item-list" id="sold-list"></div>
+        <p class="empty-state hidden" id="sold-empty">No sales yet. Mark an in-stock item as sold when you make a sale!</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add Stock Modal -->
+  <dialog class="modal" id="purchase-modal">
+    <form id="purchase-form" method="dialog">
+      <h3>Add Stock</h3>
+      <p class="modal-desc">Record a Brainrot you bought. The price adds to <strong>Total Spent</strong> and lowers <strong>Net Profit</strong>.</p>
+      <label>
+        Brainrot
+        <div class="brainrot-picker" id="brainrot-picker">
+          <div class="picker-selected hidden" id="picker-selected">
+            <div id="picker-selected-thumb" class="atlas-thumb atlas-thumb--md" aria-hidden="true"></div>
+            <div class="picker-selected-info">
+              <strong id="picker-selected-name"></strong>
+              <span id="picker-selected-rarity" class="rarity-badge"></span>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" id="picker-clear">Change</button>
+          </div>
+          <div class="picker-search-wrap" id="picker-search-wrap">
+            <input type="search" id="purchase-search" placeholder="Search brainrots..." autocomplete="off">
+            <div class="picker-results hidden" id="picker-results" role="listbox"></div>
+          </div>
+          <input type="hidden" id="purchase-slug" required>
+          <input type="hidden" id="purchase-name">
+        </div>
+      </label>
+      <label id="mutation-label" class="hidden">
+        Mutation
+        <div class="mutation-grid" id="mutation-grid" role="radiogroup" aria-label="Choose mutation"></div>
+        <input type="hidden" id="purchase-mutation" value="default">
+      </label>
+      <label id="traits-label">
+        Traits <span class="optional">optional · select all that apply</span>
+        <div class="traits-grid" id="traits-grid" role="group" aria-label="Choose traits"></div>
+      </label>
+      <label>
+        Purchase Price ($)
+        <input type="number" id="purchase-price" placeholder="0.00" min="0" step="0.01" required>
+      </label>
+      <label>
+        Asking / List Price ($) <span class="optional">optional</span>
+        <input type="number" id="purchase-asking" placeholder="0.00" min="0" step="0.01">
+      </label>
+      <label>
+        Notes <span class="optional">optional</span>
+        <input type="text" id="purchase-notes" placeholder="Extra notes..." maxlength="120">
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="purchase-cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add to Stock</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Mark Sold Modal -->
+  <dialog class="modal" id="sell-modal">
+    <form id="sell-form" method="dialog">
+      <h3>Mark as Sold</h3>
+      <div class="sell-item-header" id="sell-item-header">
+        <div id="sell-item-thumb" class="atlas-thumb atlas-thumb--lg hidden" aria-hidden="true"></div>
+        <p class="modal-desc">Enter how much you sold <strong id="sell-item-name"></strong> for.</p>
+      </div>
+      <div class="sell-info">
+        <span>Paid: <strong id="sell-purchase-price"></strong></span>
+      </div>
+      <label>
+        Sale Price ($)
+        <input type="number" id="sell-price" placeholder="0.00" min="0" step="0.01" required>
+      </label>
+      <div class="profit-preview" id="profit-preview"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="sell-cancel">Cancel</button>
+        <button type="submit" class="btn btn-success">Confirm Sale</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Edit Stat Modal -->
+  <dialog class="modal modal-sm" id="stat-modal">
+    <form id="stat-form" method="dialog">
+      <h3 id="stat-modal-title">Edit Stat</h3>
+      <p class="modal-desc" id="stat-modal-desc">Set a starting amount. New purchases and sales will still add on top.</p>
+      <p class="stat-from-items">From items: <strong id="stat-calculated-value">$0.00</strong></p>
+      <label id="stat-input-label">
+        <span id="stat-input-label-text">Custom value</span>
+        <input type="number" id="stat-input" step="0.01">
+      </label>
+      <div class="modal-actions modal-actions--stack">
+        <button type="button" class="btn btn-ghost btn-sm" id="stat-sync">Clear adjustment</button>
+        <div class="modal-actions-row">
+          <button type="button" class="btn btn-ghost" id="stat-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Delete Confirm Modal -->
+  <dialog class="modal modal-sm" id="delete-modal">
+    <form id="delete-form" method="dialog">
+      <h3>Delete Item?</h3>
+      <p class="modal-desc">This will permanently remove <strong id="delete-item-name"></strong> and adjust your totals.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="delete-cancel">Cancel</button>
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="catalog-data.js"></script>
+  <script src="types-data.js"></script>
+  <script src="traits-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
