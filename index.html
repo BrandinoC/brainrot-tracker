@@ -6,12 +6,28 @@
   <meta name="description" content="Track your Brainrot sales, purchases, stock, and profit from Steal The Brainrots.">
   <meta name="app-version" content="1.0.0">
   <title>RotVault | Steal The Brainrots</title>
+  <link rel="icon" type="image/png" href="electron/icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="desktop-shell" id="desktop-shell">
+    <header class="desktop-titlebar" id="desktop-titlebar" hidden>
+      <div class="titlebar-brand">
+        <span class="titlebar-logo" aria-hidden="true">🧠</span>
+        <span class="titlebar-title">RotVault</span>
+      </div>
+      <div class="titlebar-spacer"></div>
+      <button type="button" class="titlebar-btn titlebar-btn--settings" id="desktop-settings-btn" aria-label="Settings" title="Settings">⚙</button>
+      <div class="titlebar-controls">
+        <button type="button" class="titlebar-control titlebar-control--minimize" id="win-minimize" aria-label="Minimize" title="Minimize">−</button>
+        <button type="button" class="titlebar-control titlebar-control--maximize" id="win-maximize" aria-label="Maximize" title="Maximize">□</button>
+        <button type="button" class="titlebar-control titlebar-control--close" id="win-close" aria-label="Close" title="Close">×</button>
+      </div>
+    </header>
+    <div class="desktop-viewport">
   <div class="bg-decoration" aria-hidden="true">
     <div class="float-rot float-rot--bright" style="--x: 5%; --y: 10%; --size: 80px; --delay: 0s; --dur: 26s; --bg-x: 0%; --bg-y: 0%"></div>
     <div class="float-rot" style="--x: 92%; --y: 8%; --size: 68px; --delay: -4s; --dur: 32s; --bg-x: 62.5%; --bg-y: 0%"></div>
@@ -39,6 +55,9 @@
         <button type="button" class="btn btn-sm btn-primary" id="update-refresh">Refresh now</button>
         <button type="button" class="btn btn-sm btn-ghost" id="update-dismiss">Later</button>
       </div>
+    </div>
+    <div class="demo-banner hidden" id="demo-banner" role="status">
+      <p><strong>Browser demo</strong> — Click around and try the app. Totals and saving require the <strong>full desktop version</strong>.</p>
     </div>
     <header class="header">
       <div class="header-brand">
@@ -135,6 +154,61 @@
       </section>
     </main>
   </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal (desktop app) -->
+  <dialog class="modal modal-sm" id="settings-modal">
+    <form id="settings-form" method="dialog">
+      <h3>App Settings</h3>
+      <p class="modal-desc">Customize RotVault colors. Changes save automatically.</p>
+      <div class="settings-presets" id="settings-presets">
+        <button type="button" class="settings-preset" data-preset="purple">Purple Neon</button>
+        <button type="button" class="settings-preset" data-preset="cyan">Cyber Cyan</button>
+        <button type="button" class="settings-preset" data-preset="green">Toxic Green</button>
+        <button type="button" class="settings-preset" data-preset="pink">Hot Pink</button>
+      </div>
+      <div class="settings-colors">
+        <div class="settings-color-row">
+          <label for="theme-neon">Neon border</label>
+          <input type="color" id="theme-neon" value="#a855f7">
+        </div>
+        <div class="settings-color-row">
+          <label for="theme-accent">Accent</label>
+          <input type="color" id="theme-accent" value="#7c3aed">
+        </div>
+        <div class="settings-color-row">
+          <label for="theme-accent-light">Accent highlight</label>
+          <input type="color" id="theme-accent-light" value="#a78bfa">
+        </div>
+        <div class="settings-color-row">
+          <label for="theme-bg">Background</label>
+          <input type="color" id="theme-bg" value="#0f0f1a">
+        </div>
+        <div class="settings-color-row">
+          <label for="theme-card">Cards</label>
+          <input type="color" id="theme-card" value="#1a1a2e">
+        </div>
+        <div class="settings-color-row">
+          <label for="theme-scrollbar">Scrollbars</label>
+          <input type="color" id="theme-scrollbar" value="#a855f7">
+        </div>
+      </div>
+      <div class="settings-preview" id="settings-preview">
+        Border preview
+        <div class="settings-scroll-preview neon-scroll" id="settings-scroll-preview">
+          Scroll me — neon thumb uses your scrollbar color.<br>
+          Mutations · Traits · Add Stock · Sold list
+        </div>
+      </div>
+      <div class="modal-actions modal-actions--stack">
+        <button type="button" class="btn btn-ghost btn-sm" id="settings-reset">Reset to default</button>
+        <div class="modal-actions-row">
+          <button type="button" class="btn btn-ghost" id="settings-close">Close</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
 
   <!-- Add Stock Modal -->
   <dialog class="modal" id="purchase-modal">

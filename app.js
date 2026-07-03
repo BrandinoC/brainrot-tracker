@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'brainrot-tracker-data';
+const DEMO_STAT_MESSAGE = 'Full version only';
 const STBHUB_ORIGIN = 'https://stbhub.gg';
 const BRAINROT_ICON_BASE = '/assets/images/brainrots';
 const CATALOG_SOURCES = ['data/brainrots.json', 'https://stbhub.gg/data/brainrots.json'];
@@ -515,6 +516,32 @@ function backfillItemImages() {
   if (changed) saveData();
 }
 
+function isFullVersion() {
+  return Boolean(window.rotvaultDesktop?.isDesktopApp);
+}
+
+function isDemoMode() {
+  return !isFullVersion();
+}
+
+function pulseDemoBanner() {
+  const banner = $('#demo-banner');
+  if (!banner) return;
+  banner.classList.remove('demo-banner--pulse');
+  void banner.offsetWidth;
+  banner.classList.add('demo-banner--pulse');
+}
+
+function showDemoUpgradeNotice() {
+  pulseDemoBanner();
+}
+
+function initDemoMode() {
+  if (!isDemoMode()) return;
+  document.documentElement.classList.add('demo-mode');
+  $('#demo-banner')?.classList.remove('hidden');
+}
+
 function defaultStatAdjustments() {
   return { totalMade: 0, totalSpent: 0, inStock: 0 };
 }
@@ -568,6 +595,12 @@ function migrateStatAdjustments(parsed) {
 }
 
 function loadData() {
+  if (isDemoMode()) {
+    state.items = [];
+    state.statAdjustments = defaultStatAdjustments();
+    return;
+  }
+
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -582,6 +615,8 @@ function loadData() {
 }
 
 function saveData() {
+  if (isDemoMode()) return;
+
   localStorage.setItem(STORAGE_KEY, JSON.stringify({
     items: state.items,
     statAdjustments: state.statAdjustments,
@@ -627,15 +662,48 @@ function getTotals() {
 }
 
 function renderStats() {
+  if (isDemoMode()) {
+    const madeEl = $('#total-made');
+    const spentEl = $('#total-spent');
+    const profitEl = $('#net-profit');
+    const stockEl = $('#stock-count');
+
+    madeEl.textContent = DEMO_STAT_MESSAGE;
+    spentEl.textContent = DEMO_STAT_MESSAGE;
+    profitEl.textContent = DEMO_STAT_MESSAGE;
+    stockEl.textContent = DEMO_STAT_MESSAGE;
+
+    madeEl.classList.add('locked');
+    spentEl.classList.add('locked');
+    profitEl.classList.remove('positive', 'negative', 'zero');
+    profitEl.classList.add('locked');
+    stockEl.classList.add('locked');
+
+    document.querySelector('[data-stat="totalMade"] .stat-hint').textContent =
+      'Get the full version to track sales';
+    document.querySelector('[data-stat="totalSpent"] .stat-hint').textContent =
+      'Get the full version to track spending';
+    $('#net-profit-card .stat-hint').textContent =
+      'Get the full version to track profit';
+    document.querySelector('[data-stat="inStock"] .stat-hint').textContent =
+      'Get the full version to track stock';
+
+    return;
+  }
+
   const totals = getTotals();
   const prevProfit = renderStats.lastProfit;
 
-  $('#total-made').textContent = formatMoney(totals.totalMade);
-  $('#total-spent').textContent = formatMoney(totals.totalSpent);
+  const madeEl = $('#total-made');
+  const spentEl = $('#total-spent');
+  madeEl.textContent = formatMoney(totals.totalMade);
+  spentEl.textContent = formatMoney(totals.totalSpent);
+  madeEl.classList.remove('locked');
+  spentEl.classList.remove('locked');
 
   const profitEl = $('#net-profit');
   profitEl.textContent = formatMoney(totals.netProfit);
-  profitEl.classList.remove('positive', 'negative', 'zero');
+  profitEl.classList.remove('positive', 'negative', 'zero', 'locked');
   if (totals.netProfit > 0) {
     profitEl.classList.add('positive');
   } else if (totals.netProfit < 0) {
@@ -644,7 +712,9 @@ function renderStats() {
     profitEl.classList.add('zero');
   }
 
-  $('#stock-count').textContent = String(totals.inStockCount);
+  const stockEl = $('#stock-count');
+  stockEl.textContent = String(totals.inStockCount);
+  stockEl.classList.remove('locked');
 
   const profitCard = $('#net-profit-card');
   if (
@@ -662,6 +732,11 @@ function renderStats() {
 renderStats.lastProfit = null;
 
 function openStatEditModal(statKey) {
+  if (isDemoMode()) {
+    showDemoUpgradeNotice();
+    return;
+  }
+
   const config = STAT_CONFIG[statKey];
   if (!config) return;
 
@@ -703,6 +778,11 @@ function syncStatFromItems(statKey) {
 }
 
 function resetStat(statKey) {
+  if (isDemoMode()) {
+    showDemoUpgradeNotice();
+    return;
+  }
+
   const config = STAT_CONFIG[statKey];
   if (!config) return;
 
@@ -727,6 +807,10 @@ function resetStat(statKey) {
 
 function saveStatEdit(e) {
   e.preventDefault();
+  if (isDemoMode()) {
+    showDemoUpgradeNotice();
+    return;
+  }
   if (!editingStatKey) return;
 
   const config = STAT_CONFIG[editingStatKey];
@@ -1226,6 +1310,7 @@ function addPurchase(e) {
   renderAll();
   $('#purchase-modal').close();
   switchTab('stock');
+  if (isDemoMode()) pulseDemoBanner();
 }
 
 function confirmSale(e) {
@@ -1246,6 +1331,7 @@ function confirmSale(e) {
   sellingItemId = null;
   $('#sell-modal').close();
   switchTab('sold');
+  if (isDemoMode()) pulseDemoBanner();
 }
 
 function confirmDelete(e) {
@@ -1257,6 +1343,7 @@ function confirmDelete(e) {
   saveData();
   renderAll();
   $('#delete-modal').close();
+  if (isDemoMode()) pulseDemoBanner();
 }
 
 function initTabs() {
@@ -1290,19 +1377,27 @@ function getAppVersion() {
   return document.querySelector('meta[name="app-version"]')?.content?.trim() || '0';
 }
 
+function getUpdateCheckUrl() {
+  if (window.rotvaultDesktop?.isDesktopApp) {
+    return 'https://brandinoc.github.io/brainrot-tracker/version.json';
+  }
+  return 'version.json';
+}
+
 function initUpdateChecker() {
   const banner = $('#update-banner');
   const versionLabel = $('#update-version-label');
   const refreshBtn = $('#update-refresh');
   const dismissBtn = $('#update-dismiss');
-  if (!banner || location.protocol === 'file:') return;
+  const isDesktopApp = Boolean(window.rotvaultDesktop?.isDesktopApp);
+  if (!banner || (location.protocol === 'file:' && !isDesktopApp)) return;
 
   const currentVersion = getAppVersion();
   let latestVersion = null;
 
   async function checkForUpdate() {
     try {
-      const res = await fetch(`version.json?ts=${Date.now()}`, { cache: 'no-store' });
+      const res = await fetch(`${getUpdateCheckUrl()}?ts=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) return;
       const data = await res.json();
       latestVersion = data?.version?.trim();
@@ -1312,7 +1407,12 @@ function initUpdateChecker() {
       }
       if (sessionStorage.getItem('update-dismissed') === latestVersion) return;
 
-      if (versionLabel) {
+      if (isDesktopApp) {
+        const msg = banner.querySelector('p');
+        if (msg) {
+          msg.textContent = `A new version is available (v${latestVersion}). Download the latest RotVault installer to get new features.`;
+        }
+      } else if (versionLabel) {
         versionLabel.textContent = `(v${latestVersion})`;
       }
       banner.classList.remove('hidden');
@@ -1322,6 +1422,10 @@ function initUpdateChecker() {
   }
 
   refreshBtn?.addEventListener('click', () => {
+    if (isDesktopApp) {
+      window.open('https://brandinoc.github.io/brainrot-tracker/', '_blank');
+      return;
+    }
     location.reload();
   });
 
@@ -1339,12 +1443,235 @@ function initUpdateChecker() {
   });
 }
 
+const THEME_STORAGE_KEY = 'rotvault-theme';
+
+const DEFAULT_THEME = {
+  accent: '#7c3aed',
+  accentLight: '#a78bfa',
+  neonBorder: '#a855f7',
+  scrollbarThumb: '#a855f7',
+  bgDark: '#0f0f1a',
+  bgCard: '#1a1a2e',
+};
+
+const THEME_PRESETS = {
+  purple: { ...DEFAULT_THEME },
+  cyan: {
+    accent: '#06b6d4',
+    accentLight: '#67e8f9',
+    neonBorder: '#22d3ee',
+    scrollbarThumb: '#22d3ee',
+    bgDark: '#0a1214',
+    bgCard: '#102028',
+  },
+  green: {
+    accent: '#22c55e',
+    accentLight: '#86efac',
+    neonBorder: '#4ade80',
+    scrollbarThumb: '#4ade80',
+    bgDark: '#0a120e',
+    bgCard: '#142018',
+  },
+  pink: {
+    accent: '#ec4899',
+    accentLight: '#f9a8d4',
+    neonBorder: '#f472b6',
+    scrollbarThumb: '#f472b6',
+    bgDark: '#120a10',
+    bgCard: '#201018',
+  },
+};
+
+function loadTheme() {
+  try {
+    const raw = localStorage.getItem(THEME_STORAGE_KEY);
+    if (!raw) return { ...DEFAULT_THEME };
+    return { ...DEFAULT_THEME, ...JSON.parse(raw) };
+  } catch {
+    return { ...DEFAULT_THEME };
+  }
+}
+
+function saveTheme(theme) {
+  localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(theme));
+}
+
+function applyTheme(theme) {
+  const root = document.documentElement;
+  const scrollbarThumb = theme.scrollbarThumb || theme.neonBorder || DEFAULT_THEME.scrollbarThumb;
+  root.style.setProperty('--accent', theme.accent);
+  root.style.setProperty('--accent-light', theme.accentLight);
+  root.style.setProperty('--neon-border', theme.neonBorder);
+  root.style.setProperty('--scrollbar-thumb', scrollbarThumb);
+  root.style.setProperty('--scrollbar-track', darkenHex(theme.bgDark, 0.06));
+  root.style.setProperty('--bg-dark', theme.bgDark);
+  root.style.setProperty('--bg-card', theme.bgCard);
+  root.style.setProperty('--bg-card-hover', lightenHex(theme.bgCard, 0.08));
+  root.style.setProperty('--bg-input', darkenHex(theme.bgDark, 0.04));
+}
+
+function initTheme() {
+  applyTheme(loadTheme());
+}
+
+function hexToRgb(hex) {
+  const value = hex.replace('#', '');
+  const full = value.length === 3
+    ? value.split('').map((c) => c + c).join('')
+    : value;
+  const num = parseInt(full, 16);
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
+}
+
+function rgbToHex(r, g, b) {
+  return `#${[r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('')}`;
+}
+
+function lightenHex(hex, amount) {
+  const { r, g, b } = hexToRgb(hex);
+  return rgbToHex(
+    r + (255 - r) * amount,
+    g + (255 - g) * amount,
+    b + (255 - b) * amount,
+  );
+}
+
+function darkenHex(hex, amount) {
+  const { r, g, b } = hexToRgb(hex);
+  return rgbToHex(r * (1 - amount), g * (1 - amount), b * (1 - amount));
+}
+
+function syncThemeInputs(theme) {
+  const map = {
+    'theme-neon': theme.neonBorder,
+    'theme-accent': theme.accent,
+    'theme-accent-light': theme.accentLight,
+    'theme-bg': theme.bgDark,
+    'theme-card': theme.bgCard,
+    'theme-scrollbar': theme.scrollbarThumb || theme.neonBorder,
+  };
+  for (const [id, value] of Object.entries(map)) {
+    const input = document.getElementById(id);
+    if (input) input.value = value;
+  }
+}
+
+function updateMaximizeButton(isMaximized) {
+  const btn = document.getElementById('win-maximize');
+  if (!btn) return;
+  btn.textContent = isMaximized ? '❐' : '□';
+  btn.title = isMaximized ? 'Restore' : 'Maximize';
+  btn.setAttribute('aria-label', isMaximized ? 'Restore' : 'Maximize');
+}
+
+function initDesktopShell() {
+  const desktop = window.rotvaultDesktop;
+  if (!desktop?.isDesktopApp) return;
+
+  document.documentElement.classList.add('desktop-app');
+
+  const titlebar = document.getElementById('desktop-titlebar');
+  if (titlebar) titlebar.hidden = false;
+
+  document.getElementById('win-minimize')?.addEventListener('click', () => {
+    desktop.minimize();
+  });
+
+  document.getElementById('win-maximize')?.addEventListener('click', async () => {
+    const isMaximized = await desktop.maximize();
+    updateMaximizeButton(isMaximized);
+  });
+
+  document.getElementById('win-close')?.addEventListener('click', () => {
+    desktop.close();
+  });
+
+  desktop.isMaximized().then(updateMaximizeButton);
+  desktop.onMaximizeChange?.(updateMaximizeButton);
+
+  const settingsModal = document.getElementById('settings-modal');
+  const settingsBtn = document.getElementById('desktop-settings-btn');
+  const settingsClose = document.getElementById('settings-close');
+  const settingsReset = document.getElementById('settings-reset');
+
+  settingsBtn?.addEventListener('click', () => {
+    syncThemeInputs(loadTheme());
+    settingsModal?.showModal();
+  });
+
+  settingsClose?.addEventListener('click', () => settingsModal?.close());
+  document.getElementById('settings-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    settingsModal?.close();
+  });
+
+  const colorIds = ['theme-neon', 'theme-accent', 'theme-accent-light', 'theme-bg', 'theme-card', 'theme-scrollbar'];
+  const themeKeys = {
+    'theme-neon': 'neonBorder',
+    'theme-accent': 'accent',
+    'theme-accent-light': 'accentLight',
+    'theme-bg': 'bgDark',
+    'theme-card': 'bgCard',
+    'theme-scrollbar': 'scrollbarThumb',
+  };
+
+  function updateThemeFromInputs() {
+    const current = loadTheme();
+    for (const id of colorIds) {
+      const input = document.getElementById(id);
+      if (input) current[themeKeys[id]] = input.value;
+    }
+    applyTheme(current);
+    saveTheme(current);
+    document.querySelectorAll('.settings-preset').forEach((btn) => {
+      btn.classList.remove('is-active');
+    });
+  }
+
+  for (const id of colorIds) {
+    document.getElementById(id)?.addEventListener('input', updateThemeFromInputs);
+  }
+
+  document.querySelectorAll('.settings-preset').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const preset = THEME_PRESETS[btn.dataset.preset];
+      if (!preset) return;
+      const next = { ...preset };
+      applyTheme(next);
+      saveTheme(next);
+      syncThemeInputs(next);
+      document.querySelectorAll('.settings-preset').forEach((b) => {
+        b.classList.toggle('is-active', b === btn);
+      });
+    });
+  });
+
+  settingsReset?.addEventListener('click', () => {
+    const next = { ...DEFAULT_THEME };
+    applyTheme(next);
+    saveTheme(next);
+    syncThemeInputs(next);
+    document.querySelectorAll('.settings-preset').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.preset === 'purple');
+    });
+  });
+
+  document.querySelector('.settings-preset[data-preset="purple"]')?.classList.add('is-active');
+}
+
 loadData();
+initDemoMode();
 initTabs();
 initModals();
 initPicker();
 initStatControls();
 initUpdateChecker();
+initTheme();
+initDesktopShell();
 loadTraitsCatalog();
 renderTraitsGrid();
 renderAll();

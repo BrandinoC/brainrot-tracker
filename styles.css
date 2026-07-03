@@ -8,6 +8,10 @@
   --text-muted: #8888a8;
   --accent: #7c3aed;
   --accent-light: #a78bfa;
+  --neon-border: #a855f7;
+  --scrollbar-thumb: #a855f7;
+  --scrollbar-track: #12121f;
+  --scrollbar-size: 8px;
   --green: #22c55e;
   --green-bg: rgba(34, 197, 94, 0.12);
   --red: #ef4444;
@@ -21,6 +25,113 @@
 
 *, *::before, *::after {
   box-sizing: border-box;
+}
+
+/* Neon scrollbars */
+html,
+.neon-scroll,
+.modal,
+.modal form,
+.picker-results,
+.mutation-grid,
+.traits-grid,
+html.desktop-app .desktop-viewport {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.neon-scroll::-webkit-scrollbar,
+html::-webkit-scrollbar,
+.modal::-webkit-scrollbar,
+.modal form::-webkit-scrollbar,
+.picker-results::-webkit-scrollbar,
+.mutation-grid::-webkit-scrollbar,
+.traits-grid::-webkit-scrollbar,
+html.desktop-app .desktop-viewport::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+.neon-scroll::-webkit-scrollbar-track,
+html::-webkit-scrollbar-track,
+.modal::-webkit-scrollbar-track,
+.modal form::-webkit-scrollbar-track,
+.picker-results::-webkit-scrollbar-track,
+.mutation-grid::-webkit-scrollbar-track,
+.traits-grid::-webkit-scrollbar-track,
+html.desktop-app .desktop-viewport::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+  margin: 4px;
+}
+
+.neon-scroll::-webkit-scrollbar-thumb,
+html::-webkit-scrollbar-thumb,
+.modal::-webkit-scrollbar-thumb,
+.modal form::-webkit-scrollbar-thumb,
+.picker-results::-webkit-scrollbar-thumb,
+.mutation-grid::-webkit-scrollbar-thumb,
+.traits-grid::-webkit-scrollbar-thumb,
+html.desktop-app .desktop-viewport::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--scrollbar-thumb) 85%, #fff), var(--scrollbar-thumb));
+  border-radius: 999px;
+  border: 2px solid var(--scrollbar-track);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--scrollbar-thumb) 55%, transparent);
+}
+
+.neon-scroll::-webkit-scrollbar-thumb:hover,
+html::-webkit-scrollbar-thumb:hover,
+.modal::-webkit-scrollbar-thumb:hover,
+.modal form::-webkit-scrollbar-thumb:hover,
+.picker-results::-webkit-scrollbar-thumb:hover,
+.mutation-grid::-webkit-scrollbar-thumb:hover,
+.traits-grid::-webkit-scrollbar-thumb:hover,
+html.desktop-app .desktop-viewport::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--accent-light), var(--scrollbar-thumb));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--scrollbar-thumb) 75%, transparent);
+}
+
+.neon-scroll::-webkit-scrollbar-corner,
+.modal::-webkit-scrollbar-corner,
+.modal form::-webkit-scrollbar-corner,
+.picker-results::-webkit-scrollbar-corner,
+.mutation-grid::-webkit-scrollbar-corner,
+.traits-grid::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Desktop app (.exe): style every scrollable area — Electron on Windows needs this */
+html.desktop-app,
+html.desktop-app * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+html.desktop-app *::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+html.desktop-app *::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+  margin: 4px;
+}
+
+html.desktop-app *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--scrollbar-thumb) 85%, #fff), var(--scrollbar-thumb));
+  border-radius: 999px;
+  border: 2px solid var(--scrollbar-track);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--scrollbar-thumb) 55%, transparent);
+}
+
+html.desktop-app *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--accent-light), var(--scrollbar-thumb));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--scrollbar-thumb) 75%, transparent);
+}
+
+html.desktop-app *::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 body {
@@ -38,7 +149,7 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.22), transparent),
+    radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in srgb, var(--accent) 22%, transparent), transparent),
     radial-gradient(ellipse 60% 40% at 100% 100%, rgba(59, 130, 246, 0.1), transparent),
     radial-gradient(circle at 10% 90%, rgba(34, 197, 94, 0.06), transparent 40%);
   pointer-events: none;
@@ -78,14 +189,14 @@ body::after {
   background-position: var(--bg-x) var(--bg-y);
   animation: floatDrift var(--dur, 30s) ease-in-out infinite;
   animation-delay: var(--delay, 0s);
-  filter: saturate(1.35) drop-shadow(0 0 14px rgba(124, 58, 237, 0.45));
+  filter: saturate(1.35) drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 45%, transparent));
   will-change: transform;
   border-radius: 14%;
 }
 
 .float-rot--soft {
   opacity: 0.16;
-  filter: saturate(1.2) drop-shadow(0 0 18px rgba(124, 58, 237, 0.35));
+  filter: saturate(1.2) drop-shadow(0 0 18px color-mix(in srgb, var(--accent) 35%, transparent));
 }
 
 .float-rot--bright {
@@ -121,7 +232,7 @@ body::after {
 }
 
 .float-glow--purple {
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.28), transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%);
 }
 
 .float-glow--blue {
@@ -195,14 +306,60 @@ body::after {
   gap: 0.75rem;
   margin-bottom: 1rem;
   padding: 0.85rem 1rem;
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(59, 130, 246, 0.12));
-  border: 1px solid rgba(124, 58, 237, 0.45);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, transparent), rgba(59, 130, 246, 0.12));
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
   border-radius: var(--radius);
-  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--accent) 15%, transparent);
 }
 
 .update-banner.hidden {
   display: none !important;
+}
+
+.demo-banner {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  text-align: center;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), rgba(236, 72, 153, 0.1));
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.demo-banner.hidden {
+  display: none !important;
+}
+
+.demo-banner p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.demo-banner--pulse {
+  animation: demo-banner-pulse 0.65s ease;
+}
+
+@keyframes demo-banner-pulse {
+  0%, 100% {
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--accent) 12%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 45%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+}
+
+.demo-mode .stat-value.locked {
+  font-size: clamp(0.72rem, 2.4vw, 0.92rem);
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+
+.demo-mode .stat-card-profit .stat-value.locked {
+  color: var(--text-muted);
 }
 
 .update-banner p {
@@ -235,10 +392,10 @@ body::after {
   width: 3.5rem;
   height: 3.5rem;
   border-radius: 16px;
-  background: linear-gradient(145deg, rgba(124, 58, 237, 0.35), rgba(59, 130, 246, 0.15));
-  border: 1px solid rgba(167, 139, 250, 0.45);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 35%, transparent), rgba(59, 130, 246, 0.15));
+  border: 1px solid color-mix(in srgb, var(--accent-light) 45%, transparent);
   box-shadow:
-    0 0 24px rgba(124, 58, 237, 0.35),
+    0 0 24px color-mix(in srgb, var(--accent) 35%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
   flex-shrink: 0;
 }
@@ -246,7 +403,7 @@ body::after {
 .logo-icon {
   font-size: 1.85rem;
   line-height: 1;
-  filter: drop-shadow(0 2px 8px rgba(124, 58, 237, 0.6));
+  filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--accent) 60%, transparent));
 }
 
 .header-title-block {
@@ -275,11 +432,11 @@ body::after {
 }
 
 .header-title-accent {
-  background: linear-gradient(135deg, #c084fc 0%, #7c3aed 45%, #ec4899 100%);
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 45%, color-mix(in srgb, var(--accent) 65%, #ec4899) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.45));
+  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--accent) 45%, transparent));
 }
 
 .header-title-main {
@@ -369,8 +526,8 @@ body::after {
 }
 
 .stat-card-profit {
-  border-color: rgba(124, 58, 237, 0.35);
-  background: linear-gradient(135deg, var(--bg-card), rgba(124, 58, 237, 0.08));
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  background: linear-gradient(135deg, var(--bg-card), color-mix(in srgb, var(--accent) 8%, transparent));
 }
 
 .stat-label {
@@ -422,8 +579,8 @@ body::after {
 }
 
 @keyframes profitPulse {
-  0% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.45); }
-  70% { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+  70% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent); }
   100% { box-shadow: none; }
 }
 
@@ -460,7 +617,7 @@ body::after {
 .tab.active {
   background: var(--accent);
   color: white;
-  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
 /* Panels */
@@ -546,7 +703,7 @@ body::after {
   width: 64px;
   height: 64px;
   border-radius: 12px;
-  background: rgba(124, 58, 237, 0.15);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
   border: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -611,7 +768,7 @@ body::after {
 }
 
 .status-badge.in-stock {
-  background: rgba(124, 58, 237, 0.2);
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
   color: var(--accent-light);
 }
 
@@ -677,7 +834,7 @@ body::after {
 .btn-primary {
   background: var(--accent);
   color: white;
-  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.35);
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .btn-primary:hover {
@@ -768,6 +925,9 @@ body::after {
   box-shadow: var(--shadow);
   max-width: 480px;
   width: calc(100% - 2rem);
+  max-height: min(90vh, 880px);
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .modal::backdrop {
@@ -919,7 +1079,7 @@ body::after {
 
 .picker-result:hover,
 .picker-result:focus-visible {
-  background: rgba(124, 58, 237, 0.15);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
   outline: none;
 }
 
@@ -1029,13 +1189,13 @@ body::after {
 }
 
 .mutation-tile:hover {
-  border-color: rgba(124, 58, 237, 0.45);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 .mutation-tile.is-active {
   border-color: var(--accent);
-  background: rgba(124, 58, 237, 0.14);
-  box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.25);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
 .mutation-tile .atlas-thumb {
@@ -1193,4 +1353,221 @@ body::after {
   .tabs {
     flex-direction: column;
   }
+}
+
+/* Desktop app shell (Electron only) */
+html.desktop-app,
+html.desktop-app body {
+  height: 100vh;
+  overflow: hidden;
+}
+
+html.desktop-app body {
+  background: var(--bg-dark);
+}
+
+.desktop-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+html.desktop-app .desktop-shell {
+  height: 100vh;
+  min-height: 0;
+  border: 2px solid var(--neon-border);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--neon-border) 55%, transparent),
+    0 0 40px color-mix(in srgb, var(--neon-border) 25%, transparent),
+    inset 0 0 30px color-mix(in srgb, var(--neon-border) 6%, transparent);
+}
+
+.desktop-titlebar {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  height: 40px;
+  padding: 0 0.35rem 0 1rem;
+  flex-shrink: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg-dark) 88%, var(--neon-border)),
+    var(--bg-dark)
+  );
+  border-bottom: 1px solid color-mix(in srgb, var(--neon-border) 40%, transparent);
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+html.desktop-app .desktop-titlebar {
+  display: flex;
+}
+
+.titlebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent-light);
+}
+
+.titlebar-logo {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.titlebar-spacer {
+  flex: 1;
+}
+
+.titlebar-btn,
+.titlebar-control {
+  -webkit-app-region: no-drag;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.titlebar-btn:hover,
+.titlebar-control:hover {
+  background: color-mix(in srgb, var(--neon-border) 18%, transparent);
+  color: var(--text);
+}
+
+.titlebar-btn--settings {
+  font-size: 1rem;
+  margin-right: 0.15rem;
+}
+
+.titlebar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  -webkit-app-region: no-drag;
+}
+
+.titlebar-control--minimize {
+  font-size: 1.15rem;
+  font-weight: 300;
+}
+
+.titlebar-control--maximize {
+  font-size: 0.85rem;
+}
+
+.titlebar-control--close:hover {
+  background: rgba(239, 68, 68, 0.85);
+  color: #fff;
+}
+
+.desktop-viewport {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+html.desktop-app .desktop-viewport .app {
+  padding-top: 1.25rem;
+}
+
+/* Settings modal */
+.settings-presets {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.settings-preset {
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.settings-preset:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.settings-preset.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.settings-colors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.settings-color-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.settings-color-row label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+}
+
+.settings-color-row input[type="color"] {
+  width: 44px;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-input);
+  cursor: pointer;
+}
+
+.settings-preview {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: var(--radius);
+  border: 2px solid var(--neon-border);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--neon-border) 40%, transparent);
+  background: var(--bg-card);
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--accent-light);
+  font-weight: 600;
+}
+
+.settings-scroll-preview {
+  margin-top: 0.65rem;
+  max-height: 72px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--scrollbar-track);
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  line-height: 1.6;
 }
