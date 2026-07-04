@@ -22,6 +22,7 @@
         <span class="titlebar-title">RotVault</span>
       </div>
       <div class="titlebar-spacer"></div>
+      <button type="button" class="titlebar-btn titlebar-btn--calc" id="desktop-calc-btn" aria-label="Price calculator" title="Price calculator">%</button>
       <button type="button" class="titlebar-btn titlebar-btn--settings" id="desktop-settings-btn" aria-label="Settings" title="Settings">⚙</button>
       <div class="titlebar-controls">
         <button type="button" class="titlebar-control titlebar-control--minimize" id="win-minimize" aria-label="Minimize" title="Minimize">−</button>
@@ -66,6 +67,10 @@
           <a class="header-discord-link" href="https://discord.gg/28X9wAvhnV" target="_blank" rel="noopener noreferrer">Join Discord</a>
         </div>
       </div>
+      <button type="button" class="header-tool-btn" id="open-calc-btn" title="Discount &amp; profit calculator">
+        <span class="header-tool-icon" aria-hidden="true">%</span>
+        <span class="header-tool-label">Calc</span>
+      </button>
     </header>
 
     <section class="stats-bar" aria-label="Financial summary">
@@ -151,6 +156,115 @@
   </div>
     </div>
   </div>
+
+  <!-- Price Calculator -->
+  <dialog class="modal modal-calc" id="calc-modal">
+    <div class="calc-dialog">
+      <h3>Price Calculator</h3>
+      <p class="modal-desc">Quick discount, markup, and profit math for trades.</p>
+
+      <div class="calc-tabs" role="tablist" aria-label="Calculator mode">
+        <button type="button" class="calc-tab active" role="tab" aria-selected="true" data-calc-mode="discount">Discount</button>
+        <button type="button" class="calc-tab" role="tab" aria-selected="false" data-calc-mode="markup">Markup</button>
+        <button type="button" class="calc-tab" role="tab" aria-selected="false" data-calc-mode="profit">Profit</button>
+      </div>
+
+      <div class="calc-panel active" id="calc-panel-discount" role="tabpanel">
+        <label>
+          Original price ($)
+          <input type="number" id="calc-discount-price" placeholder="100.00" min="0" step="0.01" inputmode="decimal">
+        </label>
+        <div class="calc-percent-field">
+          <span class="calc-field-label">Discount (%)</span>
+          <div class="calc-percent-row">
+            <input type="range" class="calc-range" id="calc-discount-range" min="0" max="100" step="1" value="20" aria-label="Discount percentage slider">
+            <input type="number" class="calc-pct-input" id="calc-discount-pct" min="0" max="100" step="0.5" value="20" aria-label="Discount percentage">
+          </div>
+        </div>
+        <div class="calc-presets" aria-label="Quick discount presets">
+          <button type="button" class="calc-preset" data-pct="5">5%</button>
+          <button type="button" class="calc-preset" data-pct="10">10%</button>
+          <button type="button" class="calc-preset" data-pct="15">15%</button>
+          <button type="button" class="calc-preset" data-pct="20">20%</button>
+          <button type="button" class="calc-preset" data-pct="25">25%</button>
+          <button type="button" class="calc-preset" data-pct="50">50%</button>
+        </div>
+        <div class="calc-results">
+          <div class="calc-result-card calc-result-card--hero">
+            <span class="calc-result-label">Final price</span>
+            <span class="calc-result-value" id="calc-discount-final">$0.00</span>
+          </div>
+          <div class="calc-result-card">
+            <span class="calc-result-label">You save</span>
+            <span class="calc-result-value calc-result-value--save" id="calc-discount-save">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-panel hidden" id="calc-panel-markup" role="tabpanel">
+        <label>
+          Cost / buy price ($)
+          <input type="number" id="calc-markup-cost" placeholder="50.00" min="0" step="0.01" inputmode="decimal">
+        </label>
+        <div class="calc-percent-field">
+          <span class="calc-field-label">Markup (%)</span>
+          <div class="calc-percent-row">
+            <input type="range" class="calc-range" id="calc-markup-range" min="0" max="200" step="1" value="25" aria-label="Markup percentage slider">
+            <input type="number" class="calc-pct-input" id="calc-markup-pct" min="0" max="999" step="0.5" value="25" aria-label="Markup percentage">
+          </div>
+        </div>
+        <div class="calc-presets" aria-label="Quick markup presets">
+          <button type="button" class="calc-preset" data-pct="10">10%</button>
+          <button type="button" class="calc-preset" data-pct="25">25%</button>
+          <button type="button" class="calc-preset" data-pct="50">50%</button>
+          <button type="button" class="calc-preset" data-pct="75">75%</button>
+          <button type="button" class="calc-preset" data-pct="100">100%</button>
+          <button type="button" class="calc-preset" data-pct="150">150%</button>
+        </div>
+        <div class="calc-results">
+          <div class="calc-result-card calc-result-card--hero">
+            <span class="calc-result-label">Sell price</span>
+            <span class="calc-result-value" id="calc-markup-sell">$0.00</span>
+          </div>
+          <div class="calc-result-card">
+            <span class="calc-result-label">Profit</span>
+            <span class="calc-result-value calc-result-value--profit" id="calc-markup-profit">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-panel hidden" id="calc-panel-profit" role="tabpanel">
+        <label>
+          Buy price ($)
+          <input type="number" id="calc-profit-buy" placeholder="50.00" min="0" step="0.01" inputmode="decimal">
+        </label>
+        <label>
+          Sell price ($)
+          <input type="number" id="calc-profit-sell" placeholder="75.00" min="0" step="0.01" inputmode="decimal">
+        </label>
+        <div class="calc-results calc-results--triple">
+          <div class="calc-result-card calc-result-card--hero">
+            <span class="calc-result-label">Profit</span>
+            <span class="calc-result-value calc-result-value--profit" id="calc-profit-amount">$0.00</span>
+          </div>
+          <div class="calc-result-card">
+            <span class="calc-result-label">Margin</span>
+            <span class="calc-result-value" id="calc-profit-margin">0%</span>
+            <span class="calc-result-hint">of sell price</span>
+          </div>
+          <div class="calc-result-card">
+            <span class="calc-result-label">ROI</span>
+            <span class="calc-result-value" id="calc-profit-roi">0%</span>
+            <span class="calc-result-hint">on buy price</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="calc-close">Close</button>
+      </div>
+    </div>
+  </dialog>
 
   <!-- Settings Modal (desktop app) -->
   <dialog class="modal modal-sm" id="settings-modal">

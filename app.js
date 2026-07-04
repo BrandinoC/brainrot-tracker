@@ -1704,6 +1704,157 @@ function updateMaximizeButton(isMaximized) {
   btn.setAttribute('aria-label', isMaximized ? 'Restore' : 'Maximize');
 }
 
+function parseCalcNum(value) {
+  const n = parseFloat(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function setCalcText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+function setCalcProfitClass(id, amount) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('is-positive', 'is-negative', 'is-neutral');
+  if (amount > 0) el.classList.add('is-positive');
+  else if (amount < 0) el.classList.add('is-negative');
+  else el.classList.add('is-neutral');
+}
+
+function formatCalcPercent(value) {
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${value.toFixed(1)}%`;
+}
+
+function linkCalcPercentInputs(rangeId, numId, max, onChange) {
+  const range = document.getElementById(rangeId);
+  const num = document.getElementById(numId);
+  if (!range || !num) return;
+
+  range.addEventListener('input', () => {
+    num.value = range.value;
+    updateCalcRangeFill(rangeId);
+    onChange();
+  });
+
+  num.addEventListener('input', () => {
+    const v = Math.min(max, Math.max(0, parseCalcNum(num.value)));
+    range.value = Math.min(parseCalcNum(range.max), v);
+    updateCalcRangeFill(rangeId);
+    onChange();
+  });
+
+  updateCalcRangeFill(rangeId);
+}
+
+function setCalcPercent(rangeId, numId, pct) {
+  const range = document.getElementById(rangeId);
+  const num = document.getElementById(numId);
+  if (range) range.value = Math.min(parseCalcNum(range.max), pct);
+  if (num) num.value = pct;
+  updateCalcRangeFill(rangeId);
+}
+
+function updateCalcRangeFill(rangeId) {
+  const range = document.getElementById(rangeId);
+  if (!range) return;
+  const max = parseCalcNum(range.max) || 100;
+  const val = parseCalcNum(range.value);
+  range.style.setProperty('--range-fill', `${Math.min(100, (val / max) * 100)}%`);
+}
+
+function updateDiscountCalc() {
+  const price = parseCalcNum(document.getElementById('calc-discount-price')?.value);
+  const pct = parseCalcNum(document.getElementById('calc-discount-pct')?.value);
+  const save = price * (pct / 100);
+  const final = Math.max(0, price - save);
+  setCalcText('calc-discount-final', formatMoney(final));
+  setCalcText('calc-discount-save', formatMoney(save));
+}
+
+function updateMarkupCalc() {
+  const cost = parseCalcNum(document.getElementById('calc-markup-cost')?.value);
+  const pct = parseCalcNum(document.getElementById('calc-markup-pct')?.value);
+  const sell = cost * (1 + pct / 100);
+  const profit = sell - cost;
+  setCalcText('calc-markup-sell', formatMoney(sell));
+  setCalcText('calc-markup-profit', formatMoney(profit));
+  setCalcProfitClass('calc-markup-profit', profit);
+}
+
+function updateProfitCalc() {
+  const buy = parseCalcNum(document.getElementById('calc-profit-buy')?.value);
+  const sell = parseCalcNum(document.getElementById('calc-profit-sell')?.value);
+  const profit = sell - buy;
+  const margin = sell > 0 ? (profit / sell) * 100 : 0;
+  const roi = buy > 0 ? (profit / buy) * 100 : 0;
+  setCalcText('calc-profit-amount', formatMoney(profit));
+  setCalcText('calc-profit-margin', formatCalcPercent(margin));
+  setCalcText('calc-profit-roi', formatCalcPercent(roi));
+  setCalcProfitClass('calc-profit-amount', profit);
+  setCalcProfitClass('calc-profit-margin', profit);
+  setCalcProfitClass('calc-profit-roi', profit);
+}
+
+function initCalculator() {
+  const modal = document.getElementById('calc-modal');
+  if (!modal) return;
+
+  const openCalc = () => modal.showModal();
+
+  document.getElementById('open-calc-btn')?.addEventListener('click', openCalc);
+  document.getElementById('desktop-calc-btn')?.addEventListener('click', openCalc);
+  document.getElementById('calc-close')?.addEventListener('click', () => modal.close());
+
+  const calcModes = ['discount', 'markup', 'profit'];
+  document.querySelectorAll('.calc-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const mode = tab.dataset.calcMode;
+      document.querySelectorAll('.calc-tab').forEach((t) => {
+        const active = t.dataset.calcMode === mode;
+        t.classList.toggle('active', active);
+        t.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      calcModes.forEach((m) => {
+        document.getElementById(`calc-panel-${m}`)?.classList.toggle('hidden', m !== mode);
+      });
+    });
+  });
+
+  linkCalcPercentInputs('calc-discount-range', 'calc-discount-pct', 100, updateDiscountCalc);
+  linkCalcPercentInputs('calc-markup-range', 'calc-markup-pct', 999, updateMarkupCalc);
+
+  document.querySelectorAll('.calc-preset').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const pct = parseCalcNum(btn.dataset.pct);
+      const panel = btn.closest('.calc-panel');
+      if (panel?.id === 'calc-panel-discount') {
+        setCalcPercent('calc-discount-range', 'calc-discount-pct', pct);
+        updateDiscountCalc();
+      } else if (panel?.id === 'calc-panel-markup') {
+        setCalcPercent('calc-markup-range', 'calc-markup-pct', pct);
+        updateMarkupCalc();
+      }
+    });
+  });
+
+  ['calc-discount-price', 'calc-discount-pct', 'calc-discount-range'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('input', updateDiscountCalc);
+  });
+  ['calc-markup-cost', 'calc-markup-pct', 'calc-markup-range'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('input', updateMarkupCalc);
+  });
+  ['calc-profit-buy', 'calc-profit-sell'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('input', updateProfitCalc);
+  });
+
+  updateDiscountCalc();
+  updateMarkupCalc();
+  updateProfitCalc();
+}
+
 function initDesktopShell() {
   const desktop = window.rotvaultDesktop;
   if (!desktop?.isDesktopApp) return;
@@ -1807,6 +1958,7 @@ function bootstrap() {
   initPicker();
   initStatControls();
   initTheme();
+  initCalculator();
   initDesktopShell();
   renderAll();
   initUpdateChecker();
