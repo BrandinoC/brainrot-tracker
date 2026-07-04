@@ -26,8 +26,10 @@ jobs:
 
       - name: Build site bundle
         run: |
+          ASSET_V=$(grep 'name="asset-version"' index.html | sed -n 's/.*content="\([^"]*\)".*/\1/p')
           mkdir _site
-          cp index.html app.js styles.css catalog-data.js types-data.js traits-data.js version.json .nojekyll _site/
+          sed "s|href=\"styles.css\"|href=\"styles.css?v=${ASSET_V}\"|; s|src=\"app.js\"|src=\"app.js?v=${ASSET_V}\"|" index.html > _site/index.html
+          cp app.js styles.css catalog-data.js types-data.js traits-data.js version.json .nojekyll _site/
           cp -r data _site/
           mkdir -p _site/electron
           cp electron/icon.png _site/electron/

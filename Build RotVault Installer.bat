@@ -20,7 +20,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo Building RotVault installer...
+echo Building RotVault installer (includes calculator and latest app files)...
 call npm run build
 if errorlevel 1 (
   pause
