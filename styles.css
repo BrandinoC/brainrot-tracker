@@ -1737,6 +1737,47 @@ html.desktop-app .desktop-viewport .app {
   border: 1px solid var(--border);
 }
 
+.calc-side-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+  padding: 0.3rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, var(--accent) 20%);
+}
+
+.calc-side-btn {
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.calc-side-btn:hover {
+  color: var(--text);
+}
+
+.calc-side-btn.active[data-calc-side="buying"] {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--green) 45%, transparent), color-mix(in srgb, var(--green) 18%, transparent));
+  color: #fff;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--green) 30%, transparent);
+}
+
+.calc-side-btn.active[data-calc-side="selling"] {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 55%, transparent), color-mix(in srgb, var(--accent) 25%, transparent));
+  color: #fff;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
 .calc-tab {
   padding: 0.55rem 0.5rem;
   border: none;
@@ -1940,6 +1981,10 @@ html.desktop-app .desktop-viewport .app {
 
 .calc-result-value--save {
   color: var(--green);
+}
+
+.calc-result-value--loss {
+  color: var(--red);
 }
 
 .calc-result-value.is-positive {

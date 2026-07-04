@@ -163,6 +163,11 @@
       <h3>Price Calculator</h3>
       <p class="modal-desc">Quick discount, markup, and profit math for trades.</p>
 
+      <div class="calc-side-toggle" role="group" aria-label="Buying or selling">
+        <button type="button" class="calc-side-btn" data-calc-side="buying">Buying</button>
+        <button type="button" class="calc-side-btn active" data-calc-side="selling">Selling</button>
+      </div>
+
       <div class="calc-tabs" role="tablist" aria-label="Calculator mode">
         <button type="button" class="calc-tab active" role="tab" aria-selected="true" data-calc-mode="discount">Discount</button>
         <button type="button" class="calc-tab" role="tab" aria-selected="false" data-calc-mode="markup">Markup</button>
@@ -171,7 +176,7 @@
 
       <div class="calc-panel active" id="calc-panel-discount" role="tabpanel">
         <label>
-          Original price ($)
+          <span id="calc-discount-price-label">List price ($)</span>
           <input type="number" id="calc-discount-price" placeholder="100.00" min="0" step="0.01" inputmode="decimal">
         </label>
         <div class="calc-percent-field">
@@ -191,12 +196,12 @@
         </div>
         <div class="calc-results">
           <div class="calc-result-card calc-result-card--hero">
-            <span class="calc-result-label">Final price</span>
+            <span class="calc-result-label" id="calc-discount-final-label">Sale price</span>
             <span class="calc-result-value" id="calc-discount-final">$0.00</span>
           </div>
           <div class="calc-result-card">
-            <span class="calc-result-label">You save</span>
-            <span class="calc-result-value calc-result-value--save" id="calc-discount-save">$0.00</span>
+            <span class="calc-result-label" id="calc-discount-diff-label">You lose</span>
+            <span class="calc-result-value calc-result-value--loss is-negative" id="calc-discount-save">$0.00</span>
           </div>
         </div>
       </div>

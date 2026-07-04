@@ -1765,6 +1765,34 @@ function updateCalcRangeFill(rangeId) {
   range.style.setProperty('--range-fill', `${Math.min(100, (val / max) * 100)}%`);
 }
 
+let calcTradeSide = 'selling';
+
+function applyCalcSideUI() {
+  const side = calcTradeSide;
+  document.querySelectorAll('.calc-side-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.calcSide === side);
+  });
+
+  const priceLabel = document.getElementById('calc-discount-price-label');
+  const finalLabel = document.getElementById('calc-discount-final-label');
+  const diffLabel = document.getElementById('calc-discount-diff-label');
+  const diffValue = document.getElementById('calc-discount-save');
+
+  if (side === 'buying') {
+    if (priceLabel) priceLabel.textContent = 'Asking price ($)';
+    if (finalLabel) finalLabel.textContent = 'You pay';
+    if (diffLabel) diffLabel.textContent = 'You save';
+    diffValue?.classList.remove('calc-result-value--loss', 'is-negative');
+    diffValue?.classList.add('calc-result-value--save', 'is-positive');
+  } else {
+    if (priceLabel) priceLabel.textContent = 'List price ($)';
+    if (finalLabel) finalLabel.textContent = 'Sale price';
+    if (diffLabel) diffLabel.textContent = 'You lose';
+    diffValue?.classList.remove('calc-result-value--save', 'is-positive');
+    diffValue?.classList.add('calc-result-value--loss', 'is-negative');
+  }
+}
+
 function updateDiscountCalc() {
   const price = parseCalcNum(document.getElementById('calc-discount-price')?.value);
   const pct = parseCalcNum(document.getElementById('calc-discount-pct')?.value);
@@ -1807,6 +1835,13 @@ function initCalculator() {
   document.getElementById('open-calc-btn')?.addEventListener('click', openCalc);
   document.getElementById('desktop-calc-btn')?.addEventListener('click', openCalc);
   document.getElementById('calc-close')?.addEventListener('click', () => modal.close());
+
+  document.querySelectorAll('.calc-side-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      calcTradeSide = btn.dataset.calcSide === 'buying' ? 'buying' : 'selling';
+      applyCalcSideUI();
+    });
+  });
 
   const calcModes = ['discount', 'markup', 'profit'];
   document.querySelectorAll('.calc-tab').forEach((tab) => {
@@ -1853,6 +1888,7 @@ function initCalculator() {
   updateDiscountCalc();
   updateMarkupCalc();
   updateProfitCalc();
+  applyCalcSideUI();
 }
 
 function initDesktopShell() {
