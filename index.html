@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Track your Brainrot sales, purchases, stock, and profit from Steal The Brainrots.">
   <meta name="app-version" content="1.0.0">
+  <meta name="asset-version" content="20260703b">
   <meta name="discord-invite" content="https://discord.gg/28X9wAvhnV">
   <title>RotVault | Steal The Brainrots</title>
   <link rel="icon" type="image/png" href="electron/icon.png">
@@ -12,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="data/brainrots.json" as="fetch" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260703b">
 </head>
 <body>
   <div class="desktop-shell" id="desktop-shell">
@@ -163,15 +164,15 @@
       <h3>Price Calculator</h3>
       <p class="modal-desc">Quick discount, markup, and profit math for trades.</p>
 
-      <div class="calc-side-toggle" role="group" aria-label="Buying or selling">
-        <button type="button" class="calc-side-btn" data-calc-side="buying">Buying</button>
-        <button type="button" class="calc-side-btn active" data-calc-side="selling">Selling</button>
+      <div class="calc-segment-group calc-side-toggle" id="calc-side-toggle" role="group" aria-label="Buying or selling">
+        <button type="button" class="calc-segment-btn calc-side-btn" data-calc-side="buying" aria-pressed="false">Buying</button>
+        <button type="button" class="calc-segment-btn calc-side-btn is-active" data-calc-side="selling" aria-pressed="true">Selling</button>
       </div>
 
-      <div class="calc-tabs" role="tablist" aria-label="Calculator mode">
-        <button type="button" class="calc-tab active" role="tab" aria-selected="true" data-calc-mode="discount">Discount</button>
-        <button type="button" class="calc-tab" role="tab" aria-selected="false" data-calc-mode="markup">Markup</button>
-        <button type="button" class="calc-tab" role="tab" aria-selected="false" data-calc-mode="profit">Profit</button>
+      <div class="calc-segment-group calc-tabs" role="tablist" aria-label="Calculator mode">
+        <button type="button" class="calc-segment-btn calc-tab is-active" role="tab" aria-selected="true" data-calc-mode="discount">Discount</button>
+        <button type="button" class="calc-segment-btn calc-tab" role="tab" aria-selected="false" data-calc-mode="markup">Markup</button>
+        <button type="button" class="calc-segment-btn calc-tab" role="tab" aria-selected="false" data-calc-mode="profit">Profit</button>
       </div>
 
       <div class="calc-panel active" id="calc-panel-discount" role="tabpanel">
@@ -431,6 +432,6 @@
     </form>
   </dialog>
 
-  <script defer src="app.js"></script>
+  <script defer src="app.js?v=20260703b"></script>
 </body>
 </html>

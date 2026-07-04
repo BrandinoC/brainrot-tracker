@@ -1770,7 +1770,9 @@ let calcTradeSide = 'selling';
 function applyCalcSideUI() {
   const side = calcTradeSide;
   document.querySelectorAll('.calc-side-btn').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.calcSide === side);
+    const isActive = btn.getAttribute('data-calc-side') === side;
+    btn.classList.toggle('is-active', isActive);
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
 
   const priceLabel = document.getElementById('calc-discount-price-label');
@@ -1793,6 +1795,27 @@ function applyCalcSideUI() {
   }
 }
 
+function setCalcMode(mode) {
+  const calcModes = ['discount', 'markup', 'profit'];
+  document.querySelectorAll('.calc-tab').forEach((tab) => {
+    const active = tab.getAttribute('data-calc-mode') === mode;
+    tab.classList.toggle('is-active', active);
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  calcModes.forEach((m) => {
+    document.getElementById(`calc-panel-${m}`)?.classList.toggle('hidden', m !== mode);
+  });
+  const sideToggle = document.getElementById('calc-side-toggle');
+  if (sideToggle) {
+    sideToggle.classList.toggle('hidden', mode !== 'discount');
+  }
+}
+
+function setCalcSide(side) {
+  calcTradeSide = side === 'buying' ? 'buying' : 'selling';
+  applyCalcSideUI();
+}
+
 function updateDiscountCalc() {
   const price = parseCalcNum(document.getElementById('calc-discount-price')?.value);
   const pct = parseCalcNum(document.getElementById('calc-discount-pct')?.value);
@@ -1800,6 +1823,7 @@ function updateDiscountCalc() {
   const final = Math.max(0, price - save);
   setCalcText('calc-discount-final', formatMoney(final));
   setCalcText('calc-discount-save', formatMoney(save));
+  applyCalcSideUI();
 }
 
 function updateMarkupCalc() {
@@ -1828,43 +1852,39 @@ function updateProfitCalc() {
 
 function initCalculator() {
   const modal = document.getElementById('calc-modal');
-  if (!modal) return;
+  const dialog = modal?.querySelector('.calc-dialog');
+  if (!modal || !dialog) return;
 
-  const openCalc = () => modal.showModal();
+  const openCalc = () => {
+    setCalcMode('discount');
+    applyCalcSideUI();
+    modal.showModal();
+  };
 
   document.getElementById('open-calc-btn')?.addEventListener('click', openCalc);
   document.getElementById('desktop-calc-btn')?.addEventListener('click', openCalc);
   document.getElementById('calc-close')?.addEventListener('click', () => modal.close());
 
-  document.querySelectorAll('.calc-side-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      calcTradeSide = btn.dataset.calcSide === 'buying' ? 'buying' : 'selling';
-      applyCalcSideUI();
-    });
-  });
+  dialog.addEventListener('click', (e) => {
+    const sideBtn = e.target.closest('.calc-side-btn');
+    if (sideBtn) {
+      e.preventDefault();
+      setCalcSide(sideBtn.getAttribute('data-calc-side'));
+      return;
+    }
 
-  const calcModes = ['discount', 'markup', 'profit'];
-  document.querySelectorAll('.calc-tab').forEach((tab) => {
-    tab.addEventListener('click', () => {
-      const mode = tab.dataset.calcMode;
-      document.querySelectorAll('.calc-tab').forEach((t) => {
-        const active = t.dataset.calcMode === mode;
-        t.classList.toggle('active', active);
-        t.setAttribute('aria-selected', active ? 'true' : 'false');
-      });
-      calcModes.forEach((m) => {
-        document.getElementById(`calc-panel-${m}`)?.classList.toggle('hidden', m !== mode);
-      });
-    });
-  });
+    const modeTab = e.target.closest('.calc-tab');
+    if (modeTab) {
+      e.preventDefault();
+      setCalcMode(modeTab.getAttribute('data-calc-mode'));
+      return;
+    }
 
-  linkCalcPercentInputs('calc-discount-range', 'calc-discount-pct', 100, updateDiscountCalc);
-  linkCalcPercentInputs('calc-markup-range', 'calc-markup-pct', 999, updateMarkupCalc);
-
-  document.querySelectorAll('.calc-preset').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const pct = parseCalcNum(btn.dataset.pct);
-      const panel = btn.closest('.calc-panel');
+    const presetBtn = e.target.closest('.calc-preset');
+    if (presetBtn) {
+      e.preventDefault();
+      const pct = parseCalcNum(presetBtn.getAttribute('data-pct'));
+      const panel = presetBtn.closest('.calc-panel');
       if (panel?.id === 'calc-panel-discount') {
         setCalcPercent('calc-discount-range', 'calc-discount-pct', pct);
         updateDiscountCalc();
@@ -1872,8 +1892,11 @@ function initCalculator() {
         setCalcPercent('calc-markup-range', 'calc-markup-pct', pct);
         updateMarkupCalc();
       }
-    });
+    }
   });
+
+  linkCalcPercentInputs('calc-discount-range', 'calc-discount-pct', 100, updateDiscountCalc);
+  linkCalcPercentInputs('calc-markup-range', 'calc-markup-pct', 999, updateMarkupCalc);
 
   ['calc-discount-price', 'calc-discount-pct', 'calc-discount-range'].forEach((id) => {
     document.getElementById(id)?.addEventListener('input', updateDiscountCalc);
@@ -1888,6 +1911,7 @@ function initCalculator() {
   updateDiscountCalc();
   updateMarkupCalc();
   updateProfitCalc();
+  setCalcMode('discount');
   applyCalcSideUI();
 }
 
